@@ -9,15 +9,17 @@ DEFAULT_DATASET_PATH = DATA_RAW_DIR / "ai4i2020.csv"
 RANDOM_STATE = 42
 
 TARGET_COLUMN = "Machine failure"
-DROP_COLUMNS = ["UDI", "Product ID"]
+ID_COLUMNS = ["UID", "Product ID"]
+FAILURE_MODE_COLUMNS = ["TWF", "HDF", "PWF", "OSF", "RNF"]
+DROP_COLUMNS = ID_COLUMNS
 
 NUMERIC_FEATURES = [
-    "Air temperature [K]",
-    "Process temperature [K]",
-    "Rotational speed [rpm]",
-    "Torque [Nm]",
-    "Tool wear [min]",
+    "Air temperature",
+    "Process temperature",
+    "Rotational speed",
+    "Torque",
+    "Tool wear",
 ]
 
 CATEGORICAL_FEATURES = ["Type"]
-
+INPUT_FEATURES = CATEGORICAL_FEATURES + NUMERIC_FEATURES

@@ -4,6 +4,7 @@ from predictive_maintenance.config import (
     CATEGORICAL_FEATURES,
     DEFAULT_DATASET_PATH,
     DROP_COLUMNS,
+    FAILURE_MODE_COLUMNS,
     NUMERIC_FEATURES,
     TARGET_COLUMN,
 )
@@ -25,7 +26,11 @@ def load_ai4i_dataset(path=DEFAULT_DATASET_PATH):
 def validate_columns(data):
     """Fail early if the expected AI4I columns are not present."""
     required_columns = (
-        DROP_COLUMNS + CATEGORICAL_FEATURES + NUMERIC_FEATURES + [TARGET_COLUMN]
+        DROP_COLUMNS
+        + CATEGORICAL_FEATURES
+        + NUMERIC_FEATURES
+        + [TARGET_COLUMN]
+        + FAILURE_MODE_COLUMNS
     )
     missing_columns = [column for column in required_columns if column not in data.columns]
 
@@ -41,4 +46,3 @@ def split_features_and_target(data):
     x = data[feature_columns].copy()
     y = data[TARGET_COLUMN].copy()
     return x, y
-
