@@ -2,11 +2,11 @@
 
 ## Title
 
-**Explainable Predictive Maintenance Using Anomaly Detection, Failure Classification, and Feature Relationship Analysis**
+**Explainable Predictive Maintenance Using Anomaly Detection, Failure Classification, and Explanation Evaluation**
 
 ## Abstract
 
-This project develops an Explainable and Responsible AI workflow for predictive maintenance using the AI4I 2020 Predictive Maintenance Dataset. The work begins with anomaly detection to identify abnormal machine behavior and then applies supervised classification to predict machine failure. The project also analyzes feature relationships and engineered system-level features to better understand how sensor variables interact. The main findings show that anomaly detection can identify unusual operating behavior but does not fully capture all failures, while supervised classification detects most known failures but produces false alarms. Explainability is provided through anomaly explanations, feature importance, correlation analysis, and engineered feature interpretation. The project demonstrates that predictive maintenance models should be evaluated not only by accuracy, but also by error tradeoffs, interpretability, and responsible communication of limitations.
+This project develops an Explainable and Responsible AI workflow for predictive maintenance using the AI4I 2020 Predictive Maintenance Dataset. The work combines anomaly detection, supervised failure classification, feature relationship analysis, and local and global explanation. The main findings show that anomaly detection identifies unusual operating behavior but does not capture all failures, while supervised classification detects most known failures but produces false alarms. Engineered features improve mean five-fold F1 from 0.3621 to 0.5119 while maintaining similar mean recall. SHAP faithfully reconstructs the fitted tree, whereas repeated LIME explanations show weak local surrogate fit. The project demonstrates that predictive maintenance models should be evaluated through predictive performance, explanation quality, error consequences, and clearly communicated limitations.
 
 ## 1. Introduction
 
@@ -25,6 +25,7 @@ The project is guided by the following research questions:
 3. Which sensor features and feature relationships are most important for explaining model outcomes?
 4. How do model tuning choices affect the tradeoff between missed failures and false alarms?
 5. How can Explainable and Responsible AI principles improve interpretation of predictive maintenance models?
+6. How stable and faithful are the generated explanations?
 
 ## 3. Dataset
 
@@ -67,6 +68,8 @@ Anomaly Detection
 Failure Classification
       ->
 Feature Relationship and Tuning Analysis
+      ->
+Local, Global, and Integrated Explanation Analysis
 ```
 
 ### 4.1 Data Preprocessing
@@ -75,7 +78,7 @@ The dataset was split into training and test sets using stratification to preser
 
 ### 4.2 Anomaly Detection
 
-Anomaly detection was used to identify machine records that looked unusual compared with normal operating behavior. The anomaly detector was trained using normal machine records and then evaluated on the test set. The goal was to determine whether unusual behavior overlaps with actual failure cases.
+Anomaly detection was used to identify machine records that looked unusual compared with normal operating behavior. Isolation Forest [3] was trained using normal machine records and then evaluated on the test set. The goal was to determine whether unusual behavior overlaps with actual failure cases.
 
 ### 4.3 Failure Classification
 
@@ -90,6 +93,9 @@ Explainability was added through:
 - feature correlation analysis
 - engineered relationship features
 - error analysis and model tuning interpretation
+- local and global SHAP feature contributions [5]
+- local LIME surrogate explanations [4]
+- SHAP faithfulness and LIME stability checks [6], [7]
 
 ### 4.5 Feature Relationship Analysis
 
@@ -184,6 +190,30 @@ Class weight tuning showed that a manual failure weight of 5 may provide a more 
 
 This shows a clear Responsible AI tradeoff between catching failures and reducing false alarms.
 
+### 5.6 Integrated Explanation and Validation Results
+
+Combining the anomaly and classifier outputs on the same test records produced four groups:
+
+| Signal group | Records | Failures | Observed failure rate |
+|---|---:|---:|---:|
+| Neither | 1716 | 4 | 0.23% |
+| Classifier only | 171 | 48 | 28.07% |
+| Anomaly only | 78 | 1 | 1.28% |
+| Both | 35 | 15 | 42.86% |
+
+The highest observed failure rate occurred when both methods flagged a record, but most detected failures appeared in the classifier-only group. This confirms that anomaly and failure are not equivalent.
+
+Group-level SHAP analysis showed that rotational speed and torque pushed all five false negatives away from the failure class. SHAP reconstructed the fitted tree probabilities with a mean absolute error of approximately 3.11 x 10^-14. In contrast, repeated LIME explanations produced mean local surrogate R2 values of 0.1115 for the selected false positive and 0.0970 for the selected false negative. The LIME results were readable but only weak approximations of the tree near those records.
+
+Five-fold validation strengthened the engineered-feature result:
+
+| Model | Mean precision | Mean recall | Mean F1 |
+|---|---:|---:|---:|
+| Base features | 0.2256 | 0.9204 | 0.3621 |
+| Engineered features | 0.3552 | 0.9203 | 0.5119 |
+
+The engineered model improved precision and F1 without reducing mean recall across the five folds.
+
 ## 6. Discussion
 
 The results show that anomaly detection and classification play different roles. Anomaly detection is useful for identifying unusual behavior, even when a record is not labeled as a failure. Classification is better for detecting known failure labels because it learns directly from labeled examples.
@@ -202,7 +232,7 @@ This project contributes to Explainable AI by connecting model outputs to unders
 - engineered feature relationships
 - error analysis
 
-The Responsible AI contribution comes from recognizing model limitations and tradeoffs. A high-recall model may catch most failures but produce many false alarms. A higher-precision model may reduce false alarms but miss more failures. These tradeoffs should be communicated clearly before using such a model in a real maintenance setting.
+The Responsible AI contribution comes from recognizing model limitations and tradeoffs. A high-recall model may catch most failures but produce many false alarms. A higher-precision model may reduce false alarms but miss more failures. Explanation methods also have limitations: a faithful explanation can describe the fitted model without proving that the model is physically correct, and an unstable or weak surrogate can produce a persuasive but incomplete account. These issues support the NIST AI RMF emphasis on validity, reliability, transparency, explainability, and documented risk management [8]. They are also consistent with machine-learning safety research that distinguishes test performance from system-level safety [9].
 
 The system should be treated as decision support, not as an autonomous maintenance decision-maker.
 
@@ -213,26 +243,27 @@ This project has several limitations:
 - The dataset is synthetic.
 - The system was not tested in a real industrial environment.
 - The models are simple and intended for interpretability.
-- Feature importance gives useful global explanation but does not fully explain every individual prediction.
+- LIME explanations had low local surrogate R2 for the two audited cases.
+- SHAP explains the fitted model but does not establish physical causality.
+- No maintenance engineer evaluated the usefulness of the explanations.
 - Anomaly detection does not directly predict failure.
-- The cost of false positives and false negatives was discussed conceptually but not quantified with real industrial cost data.
+- The cost analysis used hypothetical ratios rather than industrial cost data.
 
 ## 9. Future Work
 
 Future work may include:
 
-- local explanations for individual failure predictions
-- cost-sensitive evaluation
 - comparison with additional explainable models
 - calibration of predicted probabilities
 - testing on a real industrial predictive maintenance dataset
-- designing a risk score that combines anomaly detection and classification
+- evaluation of explanations with maintenance experts
+- temporal validation using real machine histories
 
 ## 10. Conclusion
 
 This project developed an Explainable and Responsible AI workflow for predictive maintenance. Anomaly detection identified unusual machine behavior, while supervised classification detected most known failures. Feature relationship analysis showed that engineered system-level features such as speed-torque ratio and power proxy provide meaningful explanatory value.
 
-The main finding is that predictive maintenance modeling requires more than basic accuracy. A responsible system must analyze false alarms, missed failures, feature relationships, and explanation quality. The project demonstrates how simple machine learning models can be made more meaningful through explainability, error analysis, and risk-aware interpretation.
+The main finding is that predictive maintenance modeling requires more than basic accuracy. A responsible system must analyze false alarms, missed failures, feature relationships, explanation quality, and uncertainty across data splits. The project demonstrates how simple machine learning models can be made more meaningful through explanation evaluation, error analysis, and explicit cost assumptions.
 
 ## References
 
@@ -240,3 +271,16 @@ The main finding is that predictive maintenance modeling requires more than basi
 
 [2] L. Cummins, A. Sommers, S. B. Ramezani, S. Mittal, J. E. Jabour, M. Seale, and S. Rahimi, "Explainable Predictive Maintenance: A Survey of Current Methods, Challenges and Opportunities," *IEEE Access*, vol. 12, pp. 57574-57602, 2024, doi: 10.1109/ACCESS.2024.3391130.
 
+[3] F. T. Liu, K. M. Ting, and Z.-H. Zhou, "Isolation Forest," in *Proc. 8th IEEE Int. Conf. Data Mining*, 2008, pp. 413-422, doi: 10.1109/ICDM.2008.17.
+
+[4] M. T. Ribeiro, S. Singh, and C. Guestrin, "'Why Should I Trust You?': Explaining the Predictions of Any Classifier," in *Proc. 22nd ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining*, 2016, pp. 1135-1144, doi: 10.1145/2939672.2939778.
+
+[5] S. M. Lundberg and S.-I. Lee, "A Unified Approach to Interpreting Model Predictions," in *Advances in Neural Information Processing Systems 30*, 2017, pp. 4765-4774.
+
+[6] D. Alvarez-Melis and T. S. Jaakkola, "On the Robustness of Interpretability Methods," in *Proc. ICML Workshop on Human Interpretability in Machine Learning*, 2018.
+
+[7] F. Doshi-Velez and B. Kim, "Towards a Rigorous Science of Interpretable Machine Learning," arXiv:1702.08608, 2017.
+
+[8] E. Tabassi, "Artificial Intelligence Risk Management Framework (AI RMF 1.0)," National Institute of Standards and Technology, NIST AI 100-1, 2023, doi: 10.6028/NIST.AI.100-1.
+
+[9] S. Mohseni, H. Wang, C. Xiao, Z. Yu, Z. Wang, and J. Yadawa, "Taxonomy of Machine Learning Safety: A Survey and Primer," *ACM Comput. Surv.*, vol. 55, no. 8, Art. no. 157, pp. 1-38, 2023, doi: 10.1145/3551385.

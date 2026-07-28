@@ -62,7 +62,9 @@ Failure Classification
       ->
 Feature Relationship Analysis
       ->
-Model Tuning and Responsible AI Interpretation
+SHAP and LIME Explanation
+      ->
+Validation and Responsible AI Interpretation
 ```
 
 Speaker note:
@@ -94,25 +96,26 @@ Speaker note:
 
 Anomaly detection identified some failure-related abnormal behavior, but it did not catch all failures. This shows anomaly detection is useful for abnormal-behavior detection, not as a complete failure classifier.
 
-## Slide 6: Anomaly Explanation
+## Slide 6: Anomaly and Classification Are Different
 
-Main finding:
+Same-record comparison:
 
-- Top anomalies were often explained by:
-  - high rotational speed
-  - low torque
-  - high tool wear
-  - unusual temperature values
+| Signal group | Records | Failures | Failure rate |
+|---|---:|---:|---:|
+| Neither | 1716 | 4 | 0.23% |
+| Classifier only | 171 | 48 | 28.07% |
+| Anomaly only | 78 | 1 | 1.28% |
+| Both | 35 | 15 | 42.86% |
 
 Recommended visual:
 
 ```text
-outputs/report_artifacts/anomaly_speed_torque_scatter.png
+outputs/integrated_research_analysis/figures/signal_agreement_matrix.png
 ```
 
 Speaker note:
 
-The explainability step compared anomalous records against normal machine behavior. This helped explain why a record looked unusual instead of only reporting an anomaly flag.
+The methods answer different questions. Agreement identifies a group with a higher observed failure rate, but many known failures are detected only by the classifier. Anomaly does not mean failure, and no flag does not guarantee safety.
 
 ## Slide 7: Failure Classification
 
@@ -141,23 +144,30 @@ Speaker note:
 
 The classifier caught most actual failures, but it produced many false alarms. This creates a useful Responsible AI discussion about recall versus precision.
 
-## Slide 8: Classification Explainability
+## Slide 8: SHAP and LIME Explanations
 
-Most important features:
+Global SHAP ranking:
 
 1. Rotational speed
 2. Torque
 3. Tool wear
 
+Local cases studied:
+
+- true positive
+- false positive
+- false negative
+- true negative
+
 Recommended visual:
 
 ```text
-outputs/report_artifacts/classification_feature_importance.png
+outputs/explainable_ai/figures/shap_global_importance.png
 ```
 
 Speaker note:
 
-The classifier's explanations aligned with anomaly detection findings. Both methods pointed to rotational speed, torque, and tool wear as important.
+SHAP explains how each feature moves a prediction away from the model baseline. LIME fits an approximate local model. The methods were compared rather than treated as interchangeable.
 
 ## Slide 9: Feature Relationships
 
@@ -182,24 +192,24 @@ Speaker note:
 
 This step asks whether machine failure is related to combinations of features. For example, torque and rotational speed together approximate a power-like relationship.
 
-## Slide 10: Engineered Feature Results
+## Slide 10: Five-Fold Feature Results
 
 Model comparison:
 
-| Model | Precision | Recall | F1 | False Positives | False Negatives |
-|---|---:|---:|---:|---:|---:|
-| Base features | 0.3058 | 0.9265 | 0.4599 | 143 | 5 |
-| Base + engineered | 0.3509 | 0.8824 | 0.5021 | 111 | 8 |
+| Model | Mean precision | Mean recall | Mean F1 |
+|---|---:|---:|---:|
+| Base features | 0.2256 | 0.9204 | 0.3621 |
+| Base + engineered | 0.3552 | 0.9203 | 0.5119 |
 
 Recommended visual:
 
 ```text
-outputs/feature_relationships/engineered_model_feature_importance.png
+outputs/integrated_research_analysis/figures/five_fold_model_comparison.png
 ```
 
 Speaker note:
 
-Engineered features reduced false alarms and improved F1, but missed slightly more failures. This is a meaningful tradeoff.
+The engineered features improved mean precision and F1 while maintaining almost identical mean recall across five data splits. This is stronger evidence than reporting only the best holdout result.
 
 ## Slide 11: Responsible AI Tradeoff
 
@@ -211,20 +221,21 @@ Catch more failures
 Reduce false alarms
 ```
 
-Examples:
+Cost-sensitivity result:
 
-- Balanced model: catches 63 failures, 143 false alarms
-- Class weight 5: catches 58 failures, 78 false alarms
+- Missed-failure cost ratio 1-5: failure weight 5
+- Ratio 6-14: threshold 0.8
+- Ratio 15 or greater: high-recall threshold 0.5
 
 Recommended visual:
 
 ```text
-outputs/model_tuning/class_weight_tuning.png
+outputs/integrated_research_analysis/figures/cost_sensitivity.png
 ```
 
 Speaker note:
 
-The model setting depends on the maintenance context. If failures are very costly, high recall is preferred. If inspections are expensive, fewer false alarms may be preferred.
+There is no universally responsible threshold. The preferred setting changes with the assumed consequences of missed failures and false alarms. These ratios are sensitivity assumptions, not real industrial cost estimates.
 
 ## Slide 12: Conclusion and Next Steps
 
@@ -233,20 +244,22 @@ Conclusion:
 - Anomaly detection identifies abnormal behavior.
 - Classification detects known failures more effectively.
 - Feature relationships improve interpretability.
-- Model tuning reveals responsible tradeoffs.
+- Engineered features improve five-fold F1.
+- SHAP is faithful to the fitted tree.
+- Selected LIME explanations have weak local surrogate fit.
+- Model tuning reveals cost-dependent tradeoffs.
 - The system should be used as decision support, not autonomous decision-making.
 
 Future work:
 
-- local explanations
-- cost-sensitive evaluation
 - probability calibration
 - testing on real industrial data
-- combined risk scoring
+- explanation evaluation with maintenance experts
+- temporal validation using machine histories
 
 Speaker note:
 
-The main takeaway is that responsible predictive maintenance requires more than accuracy. It requires explanations, error analysis, and clear communication of tradeoffs.
+The main takeaway is that responsible predictive maintenance requires more than accuracy or a readable explanation. It requires error analysis, explanation evaluation, validation across splits, and clear communication of limitations.
 
 ## Optional Backup Slide: Key Numbers
 
@@ -270,3 +283,7 @@ Class weight 5:
 - false alarms reduced to 78
 - detected 58 of 68 failures
 
+Explanation audit:
+
+- SHAP mean reconstruction error: approximately 3.11 x 10^-14
+- LIME mean surrogate R2: 0.1115 for FP and 0.0970 for FN
