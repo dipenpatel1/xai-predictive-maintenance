@@ -6,7 +6,7 @@
 
 ## Abstract
 
-This project develops an Explainable and Responsible AI workflow for predictive maintenance using the AI4I 2020 Predictive Maintenance Dataset. The work combines anomaly detection, supervised failure classification, feature relationship analysis, and local and global explanation. The main findings show that anomaly detection identifies unusual operating behavior but does not capture all failures, while supervised classification detects most known failures but produces false alarms. Engineered features improve mean five-fold F1 from 0.3621 to 0.5119 while maintaining similar mean recall. SHAP faithfully reconstructs the fitted tree, whereas repeated LIME explanations show weak local surrogate fit. The project demonstrates that predictive maintenance models should be evaluated through predictive performance, explanation quality, error consequences, and clearly communicated limitations.
+This project develops an Explainable and Responsible AI workflow for predictive maintenance using the AI4I 2020 Predictive Maintenance Dataset. The work combines anomaly detection, decision-tree and neural-network failure classification, feature relationship analysis, and local and global explanation. Anomaly detection identifies unusual behavior but does not capture all failures, while classification detects known failure patterns but produces false alarms. Engineered features improve mean five-fold tree F1 from 0.3621 to 0.5119 while maintaining similar mean recall. A small neural network achieves the highest mean ROC-AUC, 0.9501, but does not outperform the engineered tree on mean precision, recall, F1, or PR-AUC. SHAP faithfully reconstructs model outputs, whereas LIME explanations show limited local surrogate fit. The project demonstrates that predictive maintenance models should be evaluated through positive-class performance, explanation quality, model complexity, error consequences, and clearly communicated limitations.
 
 ## 1. Introduction
 
@@ -26,6 +26,7 @@ The project is guided by the following research questions:
 4. How do model tuning choices affect the tradeoff between missed failures and false alarms?
 5. How can Explainable and Responsible AI principles improve interpretation of predictive maintenance models?
 6. How stable and faithful are the generated explanations?
+7. Does a neural network provide enough predictive improvement to justify its additional complexity and post-hoc explanation requirements?
 
 ## 3. Dataset
 
@@ -70,6 +71,8 @@ Failure Classification
 Feature Relationship and Tuning Analysis
       ->
 Local, Global, and Integrated Explanation Analysis
+      ->
+Neural Network and Interpretability Comparison
 ```
 
 ### 4.1 Data Preprocessing
@@ -109,6 +112,12 @@ Additional engineered features were created to capture relationships between sen
 | Speed torque ratio | `Rotational speed / Torque` | Speed-load relationship |
 
 These features were used to study whether feature interactions provide better explanatory value.
+
+### 4.6 Neural Network Comparison
+
+A small feedforward neural network was implemented with two hidden layers containing 16 and 8 ReLU neurons. Numeric features were standardized, machine `Type` was one-hot encoded, and balanced sample weights increased the influence of rare failure records. The network learned through backpropagation [10] with Adam optimization [11], L2 regularization, early stopping, and a fixed random seed.
+
+The network was evaluated at the standard threshold of 0.5. A second threshold was selected by maximizing F1 on five-fold out-of-fold predictions from the training set only. This prevented the final test labels from influencing threshold selection. Because the neural network is less intrinsically interpretable than the depth-4 tree, it was explained using permutation importance, model-agnostic SHAP, and LIME.
 
 ## 5. Results
 
@@ -214,6 +223,23 @@ Five-fold validation strengthened the engineered-feature result:
 
 The engineered model improved precision and F1 without reducing mean recall across the five folds.
 
+### 5.7 Neural Network Comparison Results
+
+The held-out model comparison was:
+
+| Configuration | Threshold | Precision | Recall | F1 | PR-AUC | ROC-AUC | False positives | False negatives |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Base tree | 0.50 | 0.3058 | 0.9265 | 0.4599 | 0.5246 | 0.9538 | 143 | 5 |
+| Engineered tree | 0.50 | 0.3509 | 0.8824 | 0.5021 | 0.7918 | 0.9255 | 111 | 8 |
+| Neural network | 0.50 | 0.2711 | 0.8971 | 0.4164 | 0.6185 | 0.9618 | 164 | 7 |
+| Neural network, selected threshold | 0.86 | 0.5281 | 0.6912 | 0.5987 | 0.6185 | 0.9618 | 42 | 21 |
+
+At the common threshold of 0.5, the neural network did not outperform the tree models on F1. The training-selected threshold improved neural-network precision and F1 but increased missed failures from 7 to 21. This improvement reflects a different decision threshold rather than a change in the learned model.
+
+Across five folds, the neural network achieved mean precision 0.2279, recall 0.8525, F1 0.3593, PR-AUC 0.5648, and ROC-AUC 0.9501. It had the highest mean ROC-AUC, but the engineered tree remained strongest on mean precision, recall, F1, and PR-AUC.
+
+Permutation importance showed that torque, air temperature, rotational speed, process temperature, and tool wear influenced neural ranking performance. Model-agnostic SHAP provided local and global contributions, while LIME surrogate R2 values ranged from 0.1164 to 0.3557 for the four selected outcome cases.
+
 ## 6. Discussion
 
 The results show that anomaly detection and classification play different roles. Anomaly detection is useful for identifying unusual behavior, even when a record is not labeled as a failure. Classification is better for detecting known failure labels because it learns directly from labeled examples.
@@ -221,6 +247,8 @@ The results show that anomaly detection and classification play different roles.
 The feature relationship analysis strengthened the project by showing that important behavior may exist in feature combinations. In particular, speed-torque ratio and power proxy became highly important when engineered features were added. This suggests that system-level relationships can improve interpretability.
 
 The tuning analysis shows that model performance should not be summarized with one accuracy number. The model must be interpreted through precision, recall, false positives, false negatives, and the practical cost of each error type.
+
+The neural-network comparison showed that additional nonlinear capacity did not automatically produce a better failure classifier. Although the network ranked records well according to ROC-AUC, its default operating point produced more false positives and its five-fold positive-class metrics were weaker than those of the engineered tree. This supports retaining the engineered tree as the primary model and using the network as a nonlinear benchmark and post-hoc explainability case study.
 
 ## 7. Responsible and Explainable AI Analysis
 
@@ -232,7 +260,7 @@ This project contributes to Explainable AI by connecting model outputs to unders
 - engineered feature relationships
 - error analysis
 
-The Responsible AI contribution comes from recognizing model limitations and tradeoffs. A high-recall model may catch most failures but produce many false alarms. A higher-precision model may reduce false alarms but miss more failures. Explanation methods also have limitations: a faithful explanation can describe the fitted model without proving that the model is physically correct, and an unstable or weak surrogate can produce a persuasive but incomplete account. These issues support the NIST AI RMF emphasis on validity, reliability, transparency, explainability, and documented risk management [8]. They are also consistent with machine-learning safety research that distinguishes test performance from system-level safety [9].
+The Responsible AI contribution comes from recognizing model limitations and tradeoffs. A high-recall model may catch most failures but produce many false alarms. A higher-precision model may reduce false alarms but miss more failures. The neural comparison also demonstrates that a more complex model should not be preferred merely because it can represent nonlinear behavior. Its predictive value must justify reduced intrinsic interpretability and the assumptions introduced by post-hoc explanation. Explanation methods have their own limitations: a faithful explanation can describe the fitted model without proving that the model is physically correct, and an unstable or weak surrogate can produce a persuasive but incomplete account. These issues support the NIST AI RMF emphasis on validity, reliability, transparency, explainability, and documented risk management [8]. They are also consistent with machine-learning safety research that distinguishes test performance from system-level safety [9].
 
 The system should be treated as decision support, not as an autonomous maintenance decision-maker.
 
@@ -243,7 +271,10 @@ This project has several limitations:
 - The dataset is synthetic.
 - The system was not tested in a real industrial environment.
 - The models are simple and intended for interpretability.
-- LIME explanations had low local surrogate R2 for the two audited cases.
+- Only one deliberately small neural-network architecture was evaluated.
+- Neural-network probabilities were not calibrated.
+- Global neural-network SHAP used a representative sample of 200 test records.
+- LIME explanations had low local surrogate R2 for the audited tree and neural-network cases.
 - SHAP explains the fitted model but does not establish physical causality.
 - No maintenance engineer evaluated the usefulness of the explanations.
 - Anomaly detection does not directly predict failure.
@@ -253,7 +284,7 @@ This project has several limitations:
 
 Future work may include:
 
-- comparison with additional explainable models
+- broader neural-network and explainable-model hyperparameter evaluation
 - calibration of predicted probabilities
 - testing on a real industrial predictive maintenance dataset
 - evaluation of explanations with maintenance experts
@@ -261,9 +292,9 @@ Future work may include:
 
 ## 10. Conclusion
 
-This project developed an Explainable and Responsible AI workflow for predictive maintenance. Anomaly detection identified unusual machine behavior, while supervised classification detected most known failures. Feature relationship analysis showed that engineered system-level features such as speed-torque ratio and power proxy provide meaningful explanatory value.
+This project developed an Explainable and Responsible AI workflow for predictive maintenance. Anomaly detection identified unusual machine behavior, while supervised classification detected known failure patterns. Feature relationship analysis showed that engineered system-level features such as speed-torque ratio and power proxy provide meaningful explanatory value. A neural-network comparison demonstrated that higher model complexity and strong ROC-AUC do not automatically produce better positive-class performance or a more appropriate maintenance model.
 
-The main finding is that predictive maintenance modeling requires more than basic accuracy. A responsible system must analyze false alarms, missed failures, feature relationships, explanation quality, and uncertainty across data splits. The project demonstrates how simple machine learning models can be made more meaningful through explanation evaluation, error analysis, and explicit cost assumptions.
+The main finding is that predictive maintenance modeling requires more than basic accuracy or model complexity. A responsible system must analyze false alarms, missed failures, feature relationships, ranking metrics, explanation quality, and uncertainty across data splits. The engineered decision tree remains the preferred primary model because it provides the strongest five-fold positive-class performance with simpler interpretation. The neural network remains valuable as a comparison that exposes threshold and explainability tradeoffs.
 
 ## References
 
@@ -284,3 +315,7 @@ The main finding is that predictive maintenance modeling requires more than basi
 [8] E. Tabassi, "Artificial Intelligence Risk Management Framework (AI RMF 1.0)," National Institute of Standards and Technology, NIST AI 100-1, 2023, doi: 10.6028/NIST.AI.100-1.
 
 [9] S. Mohseni, H. Wang, C. Xiao, Z. Yu, Z. Wang, and J. Yadawa, "Taxonomy of Machine Learning Safety: A Survey and Primer," *ACM Comput. Surv.*, vol. 55, no. 8, Art. no. 157, pp. 1-38, 2023, doi: 10.1145/3551385.
+
+[10] D. E. Rumelhart, G. E. Hinton, and R. J. Williams, "Learning Representations by Back-Propagating Errors," *Nature*, vol. 323, pp. 533-536, 1986, doi: 10.1038/323533a0.
+
+[11] D. P. Kingma and J. Ba, "Adam: A Method for Stochastic Optimization," in *Proc. 3rd Int. Conf. Learning Representations*, 2015.

@@ -141,7 +141,40 @@ Use this for:
 - generating prediction probabilities
 - extracting feature importance
 
-## 5. Why This Refactor Matters
+## 5. Neural Network Comparison
+
+Class:
+
+```python
+from predictive_maintenance.neural_network import NeuralNetworkExperiment
+```
+
+Example:
+
+```python
+from predictive_maintenance.data_loader import load_ai4i_dataset
+from predictive_maintenance.neural_network import NeuralNetworkExperiment
+
+data = load_ai4i_dataset()
+
+experiment = NeuralNetworkExperiment(hidden_layer_sizes=(16, 8)).fit(data)
+default_metrics = experiment.metrics_frame(threshold=0.5)
+selected = experiment.select_threshold_from_training(folds=5)
+selected_metrics = experiment.metrics_frame(
+    threshold=experiment.selected_threshold
+)
+training_history = experiment.training_history()
+```
+
+Use this for:
+
+- training a small weighted feedforward neural network
+- inspecting training and validation history
+- evaluating PR-AUC and ROC-AUC as well as threshold metrics
+- selecting an alternative threshold from training folds only
+- comparing model complexity with the decision tree
+
+## 6. Why This Refactor Matters
 
 This structure supports research-style iteration:
 
@@ -163,7 +196,7 @@ tune model settings
 
 Instead of rewriting the same code in each notebook, future experiments can import the reusable classes and focus on research questions.
 
-## 6. Example End-to-End Usage
+## 7. Example End-to-End Usage
 
 Run this from the project root:
 
@@ -187,4 +220,3 @@ classification_experiment = FailureClassificationExperiment().fit(data)
 print(classification_experiment.metrics_frame())
 print(classification_experiment.threshold_table([0.3, 0.5, 0.7]))
 ```
-

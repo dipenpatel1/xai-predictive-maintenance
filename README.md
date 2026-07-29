@@ -1,4 +1,4 @@
-# Human-in-the-Loop Anomaly Detection and Explainable Failure Classification
+# Explainable Predictive Maintenance
 
 This repository is being built for a Responsible and Explainable AI course project.
 
@@ -6,10 +6,11 @@ The project goal is to develop a small predictive maintenance prototype that:
 
 - detects abnormal machine behavior using anomaly detection
 - classifies machine records as failure or no failure
-- explains model outcomes using interpretable feature information
-- routes uncertain, anomalous, or high-risk cases to simulated human review
-- retrains the classifier after corrected human feedback
-- demonstrates Responsible AI principles such as transparency, accountability, robustness, and human oversight
+- compares interpretable decision trees with a small neural network
+- studies correlations and engineered sensor relationships
+- explains model outcomes using feature importance, SHAP, and LIME
+- evaluates explanation faithfulness and stability
+- demonstrates transparency, reliability, error tradeoffs, and appropriate-use limits
 
 ## Project Structure
 
@@ -24,13 +25,22 @@ notes/
 outputs/                # Pipeline reports are written here
 src/
   predictive_maintenance/
+    anomaly.py
+    classification.py
     config.py
     data_loader.py
     explainability.py
-    feedback.py
-    modeling.py
+    neural_network.py
+    preprocessing.py
+  01_data_exploration/
+  02_data_preprocessing/
+  03_anomaly_detection/
+  04_failure_classification/
+  05_neural_network/
+  06_feature_relationship_analysis/
+  07_explainable_ai/
+  08_integrated_research_analysis/
   linear_regression_from_scratch.py
-  run_baseline_pipeline.py
 ```
 
 ## Setup
@@ -55,31 +65,11 @@ The expected target column is:
 Machine failure
 ```
 
-## Run the Baseline Project Pipeline
+## Run the Project
 
-```bash
-PYTHONPATH=src python3 src/run_baseline_pipeline.py
-```
-
-The pipeline will:
-
-- load and preprocess the AI4I dataset
-- train an Isolation Forest anomaly detector
-- train a Decision Tree classifier
-- train a Logistic Regression baseline
-- explain global model behavior
-- simulate human review for selected cases
-- retrain the Decision Tree after feedback
-- write outputs to `outputs/`
-
-Generated outputs:
-
-```text
-outputs/classification_metrics.csv
-outputs/simulated_human_review_cases.csv
-outputs/decision_tree_feature_importance.csv
-outputs/logistic_regression_coefficients.csv
-```
+Run notebooks `01` through `08` in order. Each notebook explains its theory,
+implementation, executed findings, and report-ready artifacts. See
+`docs/reproducibility_guide.md` for the output-generation workflow.
 
 ## Learning Track
 

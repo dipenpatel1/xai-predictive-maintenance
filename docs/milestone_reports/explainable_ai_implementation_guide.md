@@ -38,7 +38,7 @@ This supports the Responsible AI goals of transparency, interpretability, accoun
 
 ## Files Added
 
-- `src/06_explainable_ai/lime_shap_explainability.ipynb`
+- `src/07_explainable_ai/lime_shap_explainability.ipynb`
 - `outputs/explainable_ai/shap_global_importance.csv`
 - `outputs/explainable_ai/shap_local_*.csv`
 - `outputs/explainable_ai/lime_local_*.csv`

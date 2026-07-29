@@ -131,7 +131,35 @@ class_weight_tuning.png
 anomaly_contamination_tuning.csv
 ```
 
-## 7. Documentation Files
+## 7. Run the Neural Network Comparison
+
+Open and run:
+
+```text
+src/05_neural_network/neural_network_comparison.ipynb
+```
+
+Outputs are saved to:
+
+```text
+outputs/neural_network_comparison/
+```
+
+Important files:
+
+```text
+holdout_model_comparison.csv
+five_fold_model_summary.csv
+neural_permutation_importance.csv
+neural_shap_global_importance.csv
+model_precision_recall_comparison.png
+five_fold_neural_comparison.png
+```
+
+The notebook uses scikit-learn's `MLPClassifier`; no TensorFlow installation
+is required.
+
+## 8. Documentation Files
 
 Main report and presentation documents:
 
@@ -149,7 +177,8 @@ docs/milestone_reports/failure_classification_findings.md
 docs/milestone_reports/feature_relationship_findings.md
 docs/milestone_reports/model_tuning_findings.md
 docs/milestone_reports/research_analysis_plan.md
+docs/milestone_reports/integrated_research_analysis_findings.md
+docs/milestone_reports/neural_network_comparison_findings.md
 docs/model_tuning_research_roadmap.md
 docs/reusable_code_guide.md
 ```
-

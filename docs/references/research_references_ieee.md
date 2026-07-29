@@ -148,6 +148,29 @@ Use for:
 - terminology for black-box, local, global, and model-agnostic explanations
 - positioning LIME and SHAP within the wider XAI literature
 
+### [12] Backpropagation
+
+D. E. Rumelhart, G. E. Hinton, and R. J. Williams, "Learning
+Representations by Back-Propagating Errors," *Nature*, vol. 323,
+pp. 533-536, 1986, doi:
+[10.1038/323533a0](https://doi.org/10.1038/323533a0).
+
+Use for:
+
+- the conceptual basis of neural-network backpropagation
+- explaining how output error updates weights in earlier layers
+
+### [13] Adam Optimization
+
+D. P. Kingma and J. Ba, "Adam: A Method for Stochastic Optimization," in
+*Proc. 3rd Int. Conf. Learning Representations*, 2015. [Online]. Available:
+[arXiv:1412.6980](https://arxiv.org/abs/1412.6980).
+
+Use for:
+
+- the optimizer used by the neural-network comparison
+- adaptive first- and second-moment gradient updates
+
 ## Suggested Citation Placement
 
 | Report section | Suggested references |
@@ -157,11 +180,12 @@ Use for:
 | Explainability method | [4], [5], [11] |
 | Explanation evaluation | [6], [7] |
 | Responsible AI discussion | [8], [9], [10] |
+| Neural-network comparison | [12], [13] |
 | Limitations and future work | [1], [2], [6], [8], [9] |
 
-For a concise course report, references [1]-[9] are sufficient. Add [10] when
-discussing the choice of a simple tree, and [11] when a broader XAI taxonomy
-is useful.
+For a concise course report, references [1]-[9] support the original workflow.
+Add [10] when discussing the choice of a simple tree, [11] for a broader XAI
+taxonomy, and [12]-[13] for the neural-network comparison.
 
 ## Audit of Quiz 2-4 Sources
 
@@ -176,9 +200,9 @@ The local Quiz 2 folder contains:
   Gradient Problem in Plain Recurrent Networks," arXiv:1801.06105, 2018.
 
 These papers concern recurrent-network optimization. They are useful course
-background but are not directly relevant to the present tree-based,
-tabular predictive-maintenance workflow. They should not be included in the
-final report unless a neural or temporal extension is actually implemented.
+background but are not directly relevant to the present tabular feedforward
+network, which has no recurrent or temporal connections. They should not be
+included in the final report.
 
 ### Quiz 3
 

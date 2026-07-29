@@ -2,7 +2,7 @@
 
 ## Slide 1: Title
 
-**Explainable Predictive Maintenance Using Anomaly Detection and Failure Classification**
+**Explainable Predictive Maintenance Using Anomaly Detection, Failure Classification, and Explanation Evaluation**
 
 Presenter: Bijay Pandey  
 Course: Responsible and Explainable AI
@@ -18,6 +18,16 @@ Main points:
 - Industrial machine failures can cause downtime, cost, and safety concerns.
 - Predictive maintenance uses sensor data to identify abnormal behavior and possible failure.
 - A useful system should not only predict, but also explain why a machine is risky.
+
+The project asks more than:
+Can a model predict machine failure?
+
+It asks:
+How are anomalies different from failures?
+Which features influence predictions?
+Where does the classifier fail?
+Are explanations faithful and stable?
+How do error consequences affect model selection?
 
 Speaker note:
 
@@ -65,6 +75,8 @@ Feature Relationship Analysis
 SHAP and LIME Explanation
       ->
 Validation and Responsible AI Interpretation
+      ->
+Neural Network Comparison
 ```
 
 Speaker note:
@@ -171,8 +183,6 @@ SHAP explains how each feature moves a prediction away from the model baseline. 
 
 ## Slide 9: Feature Relationships
 
-Professor-guided research step:
-
 Study relationships between features, not only individual features.
 
 Engineered features:
@@ -191,6 +201,15 @@ outputs/feature_relationships/feature_correlation_matrix.png
 Speaker note:
 
 This step asks whether machine failure is related to combinations of features. For example, torque and rotational speed together approximate a power-like relationship.
+
+```text
+Temperature difference = Process temperature - Air temperature
+Power proxy = Torque x Rotational speed
+Wear-load interaction = Tool wear x Torque
+Speed-load ratio = Rotational speed / (Torque + epsilon)
+```
+
+These are interpretable candidate relationships, not discovered physical equations. The speed-torque ratio had only 0.063 correlation with failure but became the engineered tree's most-used feature, demonstrating that low linear correlation does not rule out useful nonlinear thresholds.
 
 ## Slide 10: Five-Fold Feature Results
 
@@ -211,7 +230,27 @@ Speaker note:
 
 The engineered features improved mean precision and F1 while maintaining almost identical mean recall across five data splits. This is stronger evidence than reporting only the best holdout result.
 
-## Slide 11: Responsible AI Tradeoff
+## Slide 11: Neural Network Comparison
+
+Five-fold mean results:
+
+| Model | Precision | Recall | F1 | PR-AUC | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Base tree | 0.2256 | 0.9204 | 0.3621 | 0.4584 | 0.9250 |
+| Engineered tree | 0.3552 | 0.9203 | 0.5119 | 0.7885 | 0.9439 |
+| Neural network | 0.2279 | 0.8525 | 0.3593 | 0.5648 | 0.9501 |
+
+Recommended visual:
+
+```text
+outputs/neural_network_comparison/figures/model_precision_recall_comparison.png
+```
+
+Speaker note:
+
+The neural network achieved the highest ROC-AUC, but the engineered tree remained stronger on precision, recall, F1, and PR-AUC. The additional complexity therefore did not justify replacing the more interpretable tree. The network remains useful as a nonlinear benchmark and post-hoc explanation case study.
+
+## Slide 12: Responsible AI Tradeoff
 
 Main tradeoff:
 
@@ -237,7 +276,7 @@ Speaker note:
 
 There is no universally responsible threshold. The preferred setting changes with the assumed consequences of missed failures and false alarms. These ratios are sensitivity assumptions, not real industrial cost estimates.
 
-## Slide 12: Conclusion and Next Steps
+## Slide 13: Conclusion and Next Steps
 
 Conclusion:
 
@@ -245,6 +284,7 @@ Conclusion:
 - Classification detects known failures more effectively.
 - Feature relationships improve interpretability.
 - Engineered features improve five-fold F1.
+- The neural network does not automatically outperform the interpretable tree.
 - SHAP is faithful to the fitted tree.
 - Selected LIME explanations have weak local surrogate fit.
 - Model tuning reveals cost-dependent tradeoffs.
@@ -256,6 +296,7 @@ Future work:
 - testing on real industrial data
 - explanation evaluation with maintenance experts
 - temporal validation using machine histories
+- broader neural-network architecture evaluation
 
 Speaker note:
 
@@ -287,3 +328,9 @@ Explanation audit:
 
 - SHAP mean reconstruction error: approximately 3.11 x 10^-14
 - LIME mean surrogate R2: 0.1115 for FP and 0.0970 for FN
+
+Neural-network comparison:
+
+- default threshold: precision 0.2711, recall 0.8971, F1 0.4164
+- training-selected threshold 0.86: precision 0.5281, recall 0.6912, F1 0.5987
+- selected threshold reduces false alarms but increases missed failures to 21

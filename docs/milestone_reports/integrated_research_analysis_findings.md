@@ -10,7 +10,7 @@ quality, result stability, and decision costs.
 
 The complete reproducible analysis is in:
 
-`src/07_integrated_research_analysis/integrated_research_analysis.ipynb`
+`src/08_integrated_research_analysis/integrated_research_analysis.ipynb`
 
 ## 2. Anomaly and Classification Agreement
 
@@ -47,7 +47,7 @@ negatives, and 1,789 true negatives.
 
 The five false negatives shared a recognizable pattern: higher speed, lower
 torque, and greater tool wear than the true-positive group. This supports the
-individual false-negative explanation in Notebook 06 and suggests a repeated
+individual false-negative explanation in Notebook 07 and suggests a repeated
 model blind spot.
 
 False positives were not merely borderline cases. Their mean predicted
