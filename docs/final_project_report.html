@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Explainable Predictive Maintenance - Final Report</title>
+<style>
+@page { size: Letter; margin: 0.85in 0.85in 0.8in; }
+body {
+  color: #202a30;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.42;
+  margin: 0 auto;
+  max-width: 7.4in;
+}
+.title-page {
+  min-height: 9in;
+  page-break-after: always;
+  text-align: center;
+  padding-top: 1.15in;
+}
+.title-page h1 { color: #237470; font-size: 27pt; margin: 0 0 0.3in; }
+.title-page h2 { color: #202a30; font-size: 17pt; font-weight: normal; margin: 0 0 0.7in; }
+.title-page p { line-height: 1.8; margin: 0.05in 0; }
+.contents { page-break-after: always; }
+.contents h1 { color: #237470; border-bottom: 2px solid #e27e2c; padding-bottom: 0.08in; }
+.toc-main { margin: 0.09in 0; font-weight: bold; }
+.toc-sub { margin: 0.06in 0 0.06in 0.28in; font-size: 9.5pt; }
+.contents a { color: #202a30; text-decoration: none; }
+h2 {
+  color: #237470;
+  font-size: 17pt;
+  margin: 0.26in 0 0.1in;
+  border-bottom: 1px solid #d3dde0;
+  padding-bottom: 0.04in;
+}
+h3 { color: #2d6fa4; font-size: 13pt; margin: 0.2in 0 0.07in; }
+h4 { color: #202a30; font-size: 11pt; margin: 0.14in 0 0.04in; }
+.major-break { page-break-before: always; }
+p { margin: 0.07in 0 0.12in; text-align: justify; }
+blockquote {
+  margin: 0.15in 0.35in;
+  padding: 0.12in 0.18in;
+  border-left: 4px solid #e27e2c;
+  background: #f2f6f7;
+  font-style: italic;
+}
+ul, ol { margin: 0.05in 0 0.14in 0.28in; padding-left: 0.18in; }
+li { margin: 0.035in 0; }
+table {
+  border-collapse: collapse;
+  margin: 0.12in auto 0.2in;
+  width: 100%;
+  font-size: 9pt;
+  page-break-inside: avoid;
+}
+th { background: #237470; color: white; font-weight: bold; padding: 6px; border: 1px solid #cad6d9; }
+td { padding: 5px 6px; border: 1px solid #cad6d9; vertical-align: top; }
+tr:nth-child(even) td { background: #f2f6f7; }
+figure { margin: 0.18in auto 0.24in; page-break-inside: avoid; text-align: center; }
+figure img { max-width: 6.7in; max-height: 4.9in; }
+figcaption { font-size: 9pt; color: #5b6970; margin-top: 0.06in; font-style: italic; }
+code { background: #f2f6f7; padding: 1px 3px; font-family: "Courier New", monospace; font-size: 9.5pt; }
+pre {
+  background: #202a30;
+  color: white;
+  padding: 0.12in;
+  font-family: "Courier New", monospace;
+  font-size: 9pt;
+  line-height: 1.3;
+  page-break-inside: avoid;
+}
+hr { border: 0; border-top: 1px solid #d3dde0; margin: 0.25in 0; }
+a { color: #2d6fa4; }
+</style>
+</head>
+<body>
+<section class="title-page">
+<h1 id="explainable-predictive-maintenance">Explainable Predictive Maintenance</h1>
+<h2 id="a-responsible-ai-study-of-anomaly-detection-failure-classification-feature-relationships-and-explanation-quality">A Responsible AI Study of Anomaly Detection, Failure Classification, Feature Relationships, and Explanation Quality</h2>
+<p><strong>Final Course Project Report</strong> <strong>Course:</strong> ENSE 861 - Responsible and Explainable Artificial Intelligence <strong>Student:</strong> Bijay Pandey <strong>Student ID:</strong> [Add Student ID] <strong>Instructor:</strong> [Add Instructor Name] <strong>Institution:</strong> University of Regina <strong>Date:</strong> August 2026</p>
+</section>
+<section class="contents"><h1>Table of Contents</h1><div class="toc-main"><a href="#1-introduction">1. Introduction</a></div>
+<div class="toc-sub"><a href="#1-1-research-problem">1.1 Research Problem</a></div>
+<div class="toc-sub"><a href="#1-2-research-questions">1.2 Research Questions</a></div>
+<div class="toc-sub"><a href="#1-3-project-contributions">1.3 Project Contributions</a></div>
+<div class="toc-main"><a href="#2-related-work">2. Related Work</a></div>
+<div class="toc-main"><a href="#3-dataset-and-data-preparation">3. Dataset and Data Preparation</a></div>
+<div class="toc-sub"><a href="#3-1-ai4i-2020-dataset">3.1 AI4I 2020 Dataset</a></div>
+<div class="toc-sub"><a href="#3-2-data-quality-and-class-imbalance">3.2 Data Quality and Class Imbalance</a></div>
+<div class="toc-sub"><a href="#3-3-leakage-safe-split-and-transformation">3.3 Leakage-Safe Split and Transformation</a></div>
+<div class="toc-main"><a href="#4-methodology">4. Methodology</a></div>
+<div class="toc-sub"><a href="#4-1-experimental-workflow">4.1 Experimental Workflow</a></div>
+<div class="toc-sub"><a href="#4-2-anomaly-detection">4.2 Anomaly Detection</a></div>
+<div class="toc-sub"><a href="#4-3-baseline-failure-classifier">4.3 Baseline Failure Classifier</a></div>
+<div class="toc-sub"><a href="#4-4-feature-relationships-and-engineered-tree">4.4 Feature Relationships and Engineered Tree</a></div>
+<div class="toc-sub"><a href="#4-5-neural-network-comparison">4.5 Neural-Network Comparison</a></div>
+<div class="toc-sub"><a href="#4-6-explainability">4.6 Explainability</a></div>
+<div class="toc-sub"><a href="#4-7-explanation-evaluation">4.7 Explanation Evaluation</a></div>
+<div class="toc-sub"><a href="#4-8-responsible-decision-analysis">4.8 Responsible Decision Analysis</a></div>
+<div class="toc-main"><a href="#5-results">5. Results</a></div>
+<div class="toc-sub"><a href="#5-1-anomaly-detection">5.1 Anomaly Detection</a></div>
+<div class="toc-sub"><a href="#5-2-baseline-classification">5.2 Baseline Classification</a></div>
+<div class="toc-sub"><a href="#5-3-baseline-feature-importance">5.3 Baseline Feature Importance</a></div>
+<div class="toc-sub"><a href="#5-4-feature-relationships">5.4 Feature Relationships</a></div>
+<div class="toc-sub"><a href="#5-5-neural-network-comparison">5.5 Neural-Network Comparison</a></div>
+<div class="toc-sub"><a href="#5-6-agreement-between-anomaly-and-classification-signals">5.6 Agreement Between Anomaly and Classification Signals</a></div>
+<div class="toc-sub"><a href="#5-7-global-and-local-explanations">5.7 Global and Local Explanations</a></div>
+<div class="toc-sub"><a href="#5-8-explanation-quality">5.8 Explanation Quality</a></div>
+<div class="toc-sub"><a href="#5-9-threshold-and-cost-sensitivity">5.9 Threshold and Cost Sensitivity</a></div>
+<div class="toc-main"><a href="#6-discussion">6. Discussion</a></div>
+<div class="toc-sub"><a href="#6-1-anomaly-is-not-failure">6.1 Anomaly Is Not Failure</a></div>
+<div class="toc-sub"><a href="#6-2-rare-class-performance-matters-more-than-accuracy">6.2 Rare-Class Performance Matters More Than Accuracy</a></div>
+<div class="toc-sub"><a href="#6-3-sensor-relationships-added-useful-structure">6.3 Sensor Relationships Added Useful Structure</a></div>
+<div class="toc-sub"><a href="#6-4-greater-complexity-did-not-guarantee-a-better-model">6.4 Greater Complexity Did Not Guarantee a Better Model</a></div>
+<div class="toc-sub"><a href="#6-5-explanation-is-evidence-about-the-model-not-the-machine">6.5 Explanation Is Evidence About the Model, Not the Machine</a></div>
+<div class="toc-main"><a href="#7-responsible-and-explainable-ai-analysis">7. Responsible and Explainable AI Analysis</a></div>
+<div class="toc-sub"><a href="#7-1-transparency-and-explainability">7.1 Transparency and Explainability</a></div>
+<div class="toc-sub"><a href="#7-2-validity-reliability-and-robustness">7.2 Validity, Reliability, and Robustness</a></div>
+<div class="toc-sub"><a href="#7-3-accountability-and-human-oversight">7.3 Accountability and Human Oversight</a></div>
+<div class="toc-sub"><a href="#7-4-consequence-aware-evaluation">7.4 Consequence-Aware Evaluation</a></div>
+<div class="toc-sub"><a href="#7-5-fairness-scope">7.5 Fairness Scope</a></div>
+<div class="toc-sub"><a href="#7-6-governance-boundary">7.6 Governance Boundary</a></div>
+<div class="toc-main"><a href="#8-limitations">8. Limitations</a></div>
+<div class="toc-main"><a href="#9-future-work">9. Future Work</a></div>
+<div class="toc-main"><a href="#10-conclusion">10. Conclusion</a></div>
+<div class="toc-main"><a href="#references">References</a></div>
+<div class="toc-main"><a href="#appendix-a-reproducibility-and-project-artifacts">Appendix A. Reproducibility and Project Artifacts</a></div></section>
+<h2 id="abstract">Abstract</h2>
+<p>Predictive maintenance can help organizations identify equipment problems before they lead to costly downtime or unsafe operating conditions. A prediction alone, however, is not enough for responsible decision support. Maintenance users also need to know what the model recognized, why it raised an alert, what kinds of errors it makes, and how dependable its explanations are. This project develops a compact Responsible and Explainable AI workflow using the AI4I 2020 Predictive Maintenance Dataset. The workflow combines anomaly detection, supervised failure classification, feature-relationship analysis, a neural-network comparison, and local and global explanation.</p>
+<p>The experiments show that unusual behavior and labeled failure are related but different concepts. Isolation Forest flagged 113 of 2,000 test records as anomalous, yet only 16 of the 68 actual failures were included. A balanced depth-4 decision tree detected 63 of 68 failures, producing recall of 0.9265, but also generated 143 false alarms and precision of 0.3058. Interpretable relationship features improved mean five-fold F1 from 0.3621 to 0.5119 while maintaining almost the same mean recall. A small feedforward neural network achieved the highest mean ROC-AUC, 0.9501, but did not outperform the engineered decision tree on precision, recall, F1, or PR-AUC.</p>
+<p>SHAP and LIME were then used to inspect correct predictions, false alarms, and missed failures. Tree SHAP reconstructed model outputs with near-zero numerical error, while repeated LIME explanations had weak local surrogate fit for the audited error cases. The final result is not a deployment-ready maintenance system. It is a course-level research prototype showing that responsible predictive maintenance requires more than accuracy: it requires error analysis, understandable evidence, explanation evaluation, explicit decision tradeoffs, and honest communication of limitations.</p>
+<p><strong>Keywords:</strong> predictive maintenance, Responsible AI, Explainable AI, anomaly detection, failure classification, SHAP, LIME, neural network</p>
+<hr>
+<h2 id="1-introduction">1. Introduction</h2>
+<p>Industrial equipment does not usually fail at a convenient time. A breakdown can interrupt production, damage other components, increase maintenance cost, or create safety concerns. Predictive maintenance attempts to reduce this uncertainty by using operational data to identify machines that may need attention before a serious failure occurs.</p>
+<p>The technical task appears simple: collect sensor readings and predict failure. The practical task is more demanding. A maintenance team must decide whether an alert justifies an inspection, whether repeated false alarms are wasting resources, and whether a missed failure creates unacceptable risk. If the model cannot communicate the basis of its output, users may either ignore a useful warning or place too much confidence in an unreliable one.</p>
+<p>This project studies that problem using the AI4I 2020 dataset introduced by Matzka [1]. The dataset was designed as a synthetic but accessible representation of industrial predictive maintenance and has been used to connect failure prediction with explainability. The broader explainable predictive-maintenance literature similarly argues that useful systems should support both predictive performance and human understanding [2].</p>
+<p>The project began with a narrow goal: detect abnormal machine behavior, classify failure, and explain the result. It later developed into a more research-oriented investigation. Instead of asking only whether a model could run successfully, the work examined whether anomaly and failure meant the same thing, whether sensor relationships improved repeated performance, whether a neural network justified its additional complexity, how false positives and false negatives were formed, and whether the explanation methods faithfully represented the model.</p>
+<h3 id="1-1-research-problem">1.1 Research Problem</h3>
+<p>The central research problem is:</p>
+<blockquote>How can a simple predictive-maintenance prototype combine anomaly detection, failure classification, feature relationships, and explanation in a workflow that is both technically useful and responsible about its limitations?</blockquote>
+<h3 id="1-2-research-questions">1.2 Research Questions</h3>
+<p>The investigation was guided by the following questions:</p>
+<ol>
+<li>To what extent do anomalous machine records overlap with labeled failures?</li>
+<li>Can supervised classification recognize known failure patterns more effectively than anomaly detection?</li>
+<li>Which sensor measurements and sensor relationships most influence the classifier?</li>
+<li>Does a small neural network provide enough improvement to justify its added complexity?</li>
+<li>What can explanations reveal about correct alerts, false alarms, and missed failures?</li>
+<li>How faithful and stable are the generated explanations?</li>
+<li>How do threshold and error-cost assumptions change the preferred decision rule?</li>
+</ol>
+<h3 id="1-3-project-contributions">1.3 Project Contributions</h3>
+<p>This project does not propose a new machine-learning algorithm. Its contribution is an integrated and reproducible course-level study that:</p>
+<ul>
+<li>distinguishes unusual behavior from labeled failure using the same held-out records;</li>
+<li>compares a base decision tree, an engineered decision tree, and a neural network under common validation folds;</li>
+<li>evaluates performance using rare-class measures rather than accuracy alone;</li>
+<li>explains both correct and incorrect predictions using SHAP and LIME;</li>
+<li>evaluates explanation faithfulness and stability instead of treating explanation graphics as automatically trustworthy; and</li>
+<li>frames model selection as a decision-support problem involving false alarms, missed failures, interpretability, and documented limitations.</li>
+</ul>
+<h2 id="2-related-work">2. Related Work</h2>
+<p>Predictive maintenance combines condition monitoring with data-driven estimates of degradation or failure. Matzka's AI4I work provides the dataset and the immediate foundation for this project [1]. Cummins <em>et al.</em> survey explainable predictive maintenance and identify the continuing need for explanations that are technically sound and meaningful to maintenance users [2]. These sources motivated the use of a transparent tabular workflow rather than treating model accuracy as the only project outcome.</p>
+<p>For abnormal-behavior detection, this project uses Isolation Forest. The method isolates observations through randomized tree partitions; records that require shorter paths to isolate are considered more unusual [3]. This approach is useful when the goal is to identify rare operating patterns, but it does not learn the meaning of a failure label.</p>
+<p>The local explanation methods were selected from established Explainable AI research. LIME creates perturbed samples around one record and fits a simple weighted surrogate to approximate the model in that local neighborhood [4]. SHAP represents a model output as a baseline plus additive feature contributions [5]. Because explanation methods can vary under small changes in their inputs or sampling process, robustness is itself an important evaluation property [6]. More generally, interpretability should be evaluated against a defined purpose rather than assumed from the existence of an explanation [7].</p>
+<p>The Responsible AI framing follows the NIST AI Risk Management Framework, particularly its emphasis on validity, reliability, transparency, explainability, accountability, and risk management across the AI lifecycle [8]. Machine-learning safety research also warns that test-set performance is not the same as system-level safety, especially when a model encounters conditions outside its development environment [9]. In high-consequence settings, Rudin argues that interpretable models should be preferred when they perform adequately, rather than automatically replacing them with black boxes and post-hoc explanations [10]. This informed the decision to retain a shallow tree when the neural network did not provide a clear performance advantage. Guidotti <em>et al.</em> provide broader terminology for local, global, model-specific, and model-agnostic explanation methods [11].</p>
+<p>The neural-network experiment was included as a nonlinear comparison. Its learning process follows backpropagation, in which output error is propagated through earlier layers to update model weights [12]. Adam was used as the optimizer, providing adaptive gradient-based updates during training [13].</p>
+<h2 id="3-dataset-and-data-preparation">3. Dataset and Data Preparation</h2>
+<h3 id="3-1-ai4i-2020-dataset">3.1 AI4I 2020 Dataset</h3>
+<p>The AI4I 2020 dataset contains 10,000 independent machine records and 14 columns [1]. It is synthetic, meaning that it was designed to resemble industrial conditions rather than collected from a live factory. This makes it appropriate for a controlled course project, but it also limits how confidently the results can be transferred to real equipment.</p>
+<p>The six model inputs are shown in Table 1.</p>
+<p><strong>Table 1. Model input features</strong></p>
+<table><thead><tr>
+<th>Feature</th>
+<th>Type</th>
+<th>Role in the study</th>
+</tr></thead><tbody>
+<tr>
+<td>Machine type</td>
+<td>Categorical</td>
+<td>Product-quality variant (<code>L</code>, <code>M</code>, or <code>H</code>)</td>
+</tr>
+<tr>
+<td>Air temperature</td>
+<td>Numerical</td>
+<td>Ambient thermal condition</td>
+</tr>
+<tr>
+<td>Process temperature</td>
+<td>Numerical</td>
+<td>Process thermal condition</td>
+</tr>
+<tr>
+<td>Rotational speed</td>
+<td>Numerical</td>
+<td>Machine operating speed</td>
+</tr>
+<tr>
+<td>Torque</td>
+<td>Numerical</td>
+<td>Mechanical load indicator</td>
+</tr>
+<tr>
+<td>Tool wear</td>
+<td>Numerical</td>
+<td>Accumulated wear measure</td>
+</tr>
+</tbody></table>
+<p>The target is <code>Machine failure</code>, where 1 indicates failure and 0 indicates no failure. The dataset also contains five specific failure-mode columns: tool-wear failure, heat-dissipation failure, power failure, overstrain failure, and random failure. These columns were retained only for descriptive analysis. They were excluded from model inputs because they contain outcome-related information and would create target leakage.</p>
+<h3 id="3-2-data-quality-and-class-imbalance">3.2 Data Quality and Class Imbalance</h3>
+<p>No missing values were found. The target distribution was strongly imbalanced: 9,661 records represented normal operation and 339 represented failure. The failure rate was therefore 3.39%.</p>
+<p>This imbalance is central to the evaluation. A model predicting “no failure” for every record would achieve 96.61% accuracy while detecting no failures. Accuracy was reported for completeness, but precision, recall, F1, PR-AUC, and the confusion matrix were treated as more informative measures of failure-class performance.</p>
+<h3 id="3-3-leakage-safe-split-and-transformation">3.3 Leakage-Safe Split and Transformation</h3>
+<p>The data was divided into an 80% training set and a 20% test set using a fixed random seed of 42. Stratification preserved the failure ratio: the training set contained 8,000 records with a 3.39% failure rate, while the test set contained 2,000 records with a 3.40% failure rate, including 68 failures.</p>
+<p>Machine type was one-hot encoded. Numerical features were standardized where required. All transformations were fitted on training data and then applied to the test set. The test labels were not used for model fitting, preprocessing, or neural-network threshold selection.</p>
+<h2 id="4-methodology">4. Methodology</h2>
+<h3 id="4-1-experimental-workflow">4.1 Experimental Workflow</h3>
+<p>The implementation followed a sequential workflow:</p>
+<pre>Data exploration
+      -&gt;
+Leakage-safe preprocessing
+      -&gt;
+Anomaly detection
+      -&gt;
+Failure classification
+      -&gt;
+Feature-relationship analysis
+      -&gt;
+Neural-network comparison
+      -&gt;
+SHAP and LIME explanation
+      -&gt;
+Explanation and decision-tradeoff evaluation</pre>
+<p>Each stage answered a different question. Anomaly detection examined unusualness, supervised models learned labeled failure, feature engineering tested sensor interactions, and explanation analysis investigated model behavior at both global and individual levels.</p>
+<h3 id="4-2-anomaly-detection">4.2 Anomaly Detection</h3>
+<p>Isolation Forest [3] was fitted using only the 7,729 normal records in the training set. The 271 training failures were excluded so that the anomaly detector learned a representation of normal operation. The contamination parameter was set to 0.05, and the random seed was fixed at 42.</p>
+<p>For each test record, the model produced an anomaly score and a binary flag. Lower scores indicated greater abnormality. The failure labels were used only afterward to measure overlap; they were not used to train the anomaly detector.</p>
+<p>A simple deviation explanation was also created for highly anomalous records. Each numerical value was compared with the mean and standard deviation of normal training records. The three largest absolute standardized deviations were reported. This explanation describes why a record differs from normal data; it does not explain a failure mechanism.</p>
+<h3 id="4-3-baseline-failure-classifier">4.3 Baseline Failure Classifier</h3>
+<p>The baseline supervised model was a decision tree with maximum depth 4, balanced class weights, and random seed 42. Balanced weighting increased the training influence of rare failure examples. The shallow depth was selected to limit overfitting and retain inspectable decision behavior.</p>
+<p>The tree was fitted inside a preprocessing pipeline. At the default threshold of 0.5, its failure scores were converted to failure or no-failure labels. Performance was measured through accuracy, precision, recall, F1, PR-AUC, ROC-AUC, and the confusion matrix.</p>
+<h3 id="4-4-feature-relationships-and-engineered-tree">4.4 Feature Relationships and Engineered Tree</h3>
+<p>Pairwise correlation was calculated to study linear associations. Correlation alone was not treated as a complete test of usefulness because a decision tree can learn thresholds and conditional relationships that have weak linear correlation.</p>
+<p>Four interpretable relationship features were created:</p>
+<p><strong>Table 2. Engineered relationship features</strong></p>
+<table><thead><tr>
+<th>Feature</th>
+<th>Definition</th>
+<th>Intended interpretation</th>
+</tr></thead><tbody>
+<tr>
+<td>Temperature difference</td>
+<td>Process temperature - air temperature</td>
+<td>Difference between process and ambient thermal conditions</td>
+</tr>
+<tr>
+<td>Power proxy</td>
+<td>Torque x rotational speed</td>
+<td>Approximate combined speed-load condition</td>
+</tr>
+<tr>
+<td>Wear-torque interaction</td>
+<td>Tool wear x torque</td>
+<td>Wear under mechanical load</td>
+</tr>
+<tr>
+<td>Speed-torque ratio</td>
+<td>Rotational speed / (torque + epsilon)</td>
+<td>Relative speed-load condition</td>
+</tr>
+</tbody></table>
+<p>The power feature is intentionally called a proxy. The dataset does not provide the units and physical context needed to claim an exact mechanical-power equation. The base and engineered trees used the same depth, class weighting, split, and preprocessing pattern so that the comparison focused on the added relationships.</p>
+<h3 id="4-5-neural-network-comparison">4.5 Neural-Network Comparison</h3>
+<p>A small feedforward neural network was implemented with transformed input features, hidden layers of 16 and 8 ReLU units, and one binary output. The model contained 289 trainable parameters. It used balanced sample weights, L2 regularization (<code>alpha = 0.001</code>), an initial learning rate of 0.001, Adam optimization [13], early stopping, a maximum of 500 iterations, and random seed 42. Training stopped after 162 iterations.</p>
+<p>The network was evaluated at threshold 0.5. A second threshold, 0.86, was selected by maximizing F1 on out-of-fold predictions generated from the training data only. The selected-threshold result was kept separate because changing the threshold changes the decision rule, not the learned network.</p>
+<p>For a fair model comparison, the base tree, engineered tree, and neural network were evaluated under the same stratified five-fold partitions. Mean and standard deviation were recorded for accuracy, precision, recall, F1, PR-AUC, and ROC-AUC.</p>
+<h3 id="4-6-explainability">4.6 Explainability</h3>
+<p>Global tree importance was first calculated from impurity reduction. This shows how strongly the fitted tree relied on features overall, but not the direction of influence for an individual prediction.</p>
+<p>Tree SHAP [5] was then used to calculate additive contributions for every test record. Mean absolute SHAP values provided global influence rankings, while signed local values showed whether each feature pushed one prediction toward failure or no failure.</p>
+<p>LIME [4] generated a second local explanation by sampling around each selected record and fitting a weighted linear surrogate. One example was selected from each confusion-matrix outcome:</p>
+<ul>
+<li>true positive: a correctly detected failure;</li>
+<li>false positive: a false maintenance alarm;</li>
+<li>false negative: a missed failure; and</li>
+<li>true negative: a correctly recognized normal record.</li>
+</ul>
+<h3 id="4-7-explanation-evaluation">4.7 Explanation Evaluation</h3>
+<p>SHAP faithfulness was measured by reconstructing the classifier output from the SHAP baseline and feature contributions for all 2,000 test records. Reconstruction error measures whether the explanation correctly decomposes the fitted model; it does not measure whether the model itself is correct.</p>
+<p>LIME was repeated across five random seeds for a selected false positive and false negative. Two properties were measured:</p>
+<ol>
+<li>local surrogate R2, indicating how closely LIME reproduced the classifier in the sampled neighborhood; and</li>
+<li>top-three Jaccard overlap, indicating whether repeated explanations selected the same important features.</li>
+</ol>
+<p>These checks reflect the need to evaluate explanation robustness and purpose rather than assuming that a readable explanation is reliable [6], [7].</p>
+<h3 id="4-8-responsible-decision-analysis">4.8 Responsible Decision Analysis</h3>
+<p>Threshold sensitivity was examined from 0.1 to 0.9. In addition, false positives were assigned a relative cost of 1 while false-negative cost was varied from 1 to 50. The analysis used:</p>
+<p><code>Relative cost = false positives + cost ratio x false negatives</code></p>
+<p>These ratios were hypothetical sensitivity values, not measured industrial costs. Their purpose was to show how operational priorities can change the preferred model configuration. A real deployment would require maintenance and safety experts to define acceptable errors.</p>
+<h2 id="5-results">5. Results</h2>
+<h3 id="5-1-anomaly-detection">5.1 Anomaly Detection</h3>
+<p>The anomaly detector flagged 113 of the 2,000 test records. Table 3 compares these flags with the known failure labels.</p>
+<p><strong>Table 3. Anomaly detection results</strong></p>
+<table><thead><tr>
+<th>Test outcome</th>
+<th>Count</th>
+</tr></thead><tbody>
+<tr>
+<td>Actual failures</td>
+<td>68</td>
+</tr>
+<tr>
+<td>Records flagged as anomalous</td>
+<td>113</td>
+</tr>
+<tr>
+<td>Failures also flagged as anomalous</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Normal records flagged as anomalous</td>
+<td>97</td>
+</tr>
+<tr>
+<td>Failures not flagged as anomalous</td>
+<td>52</td>
+</tr>
+</tbody></table>
+<p>Only 16 of 68 failures were anomalous, while 97 normal records were flagged. Figure 1 shows substantial overlap between normal and failure anomaly-score distributions. The result demonstrates that unusual behavior is neither necessary nor sufficient for a labeled failure.</p>
+<figure><img src="file:///Users/bijaypandey/Documents/Uni%20of%20Regina/ENSE_861/responsible_ai_project/outputs/report_artifacts/anomaly_score_distribution.png" alt="Figure 1. Distribution of anomaly scores for normal and failure records. Lower scores indicate more unusual records."><figcaption>Figure 1. Distribution of anomaly scores for normal and failure records. Lower scores indicate more unusual records.</figcaption></figure>
+<h3 id="5-2-baseline-classification">5.2 Baseline Classification</h3>
+<p>The balanced decision tree detected most failures but produced many false alarms.</p>
+<p><strong>Table 4. Baseline decision-tree performance</strong></p>
+<table><thead><tr>
+<th>Metric</th>
+<th>Value</th>
+</tr></thead><tbody>
+<tr>
+<td>Accuracy</td>
+<td>0.9260</td>
+</tr>
+<tr>
+<td>Precision</td>
+<td>0.3058</td>
+</tr>
+<tr>
+<td>Recall</td>
+<td>0.9265</td>
+</tr>
+<tr>
+<td>F1</td>
+<td>0.4599</td>
+</tr>
+<tr>
+<td>PR-AUC</td>
+<td>0.5246</td>
+</tr>
+<tr>
+<td>ROC-AUC</td>
+<td>0.9538</td>
+</tr>
+</tbody></table>
+<p>The confusion matrix in Figure 2 contains 1,789 true negatives, 143 false positives, 5 false negatives, and 63 true positives. Recall of 0.9265 means that 63 of the 68 real failures were detected. Precision of 0.3058 means that fewer than one in three failure alerts was correct.</p>
+<figure><img src="file:///Users/bijaypandey/Documents/Uni%20of%20Regina/ENSE_861/responsible_ai_project/outputs/report_artifacts/classification_confusion_matrix.png" alt="Figure 2. Confusion matrix for the baseline decision tree at threshold 0.5."><figcaption>Figure 2. Confusion matrix for the baseline decision tree at threshold 0.5.</figcaption></figure>
+<h3 id="5-3-baseline-feature-importance">5.3 Baseline Feature Importance</h3>
+<p>The tree relied mainly on rotational speed, torque, and tool wear.</p>
+<p><strong>Table 5. Baseline decision-tree feature importance</strong></p>
+<table><thead><tr>
+<th>Feature</th>
+<th>Importance</th>
+</tr></thead><tbody>
+<tr>
+<td>Rotational speed</td>
+<td>0.3543</td>
+</tr>
+<tr>
+<td>Torque</td>
+<td>0.3460</td>
+</tr>
+<tr>
+<td>Tool wear</td>
+<td>0.2673</td>
+</tr>
+<tr>
+<td>Air temperature</td>
+<td>0.0294</td>
+</tr>
+<tr>
+<td>Process temperature</td>
+<td>0.0032</td>
+</tr>
+</tbody></table>
+<p>Machine-type indicators had zero importance in this fitted depth-4 tree. This does not prove that machine type is universally irrelevant; it means the specific fitted tree did not use those indicators in its splits.</p>
+<h3 id="5-4-feature-relationships">5.4 Feature Relationships</h3>
+<p>The holdout comparison is shown in Table 6.</p>
+<p><strong>Table 6. Base and engineered-tree holdout results</strong></p>
+<table><thead><tr>
+<th>Model</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1</th>
+<th>False positives</th>
+<th>False negatives</th>
+</tr></thead><tbody>
+<tr>
+<td>Base tree</td>
+<td>0.3058</td>
+<td>0.9265</td>
+<td>0.4599</td>
+<td>143</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Engineered tree</td>
+<td>0.3509</td>
+<td>0.8824</td>
+<td>0.5021</td>
+<td>111</td>
+<td>8</td>
+</tr>
+</tbody></table>
+<p>On this split, relationship features reduced false positives and increased F1, but missed three additional failures. Repeated validation provided stronger evidence. Across five folds, the engineered tree increased mean precision from 0.2256 to 0.3552 and mean F1 from 0.3621 to 0.5119 while mean recall remained nearly unchanged at approximately 0.92.</p>
+<p>The engineered tree relied most on speed-torque ratio (0.3413), power proxy (0.3172), tool wear (0.1519), and temperature difference (0.1075). Figure 3 summarizes the repeated model comparison.</p>
+<figure><img src="file:///Users/bijaypandey/Documents/Uni%20of%20Regina/ENSE_861/responsible_ai_project/outputs/neural_network_comparison/figures/five_fold_neural_comparison.png" alt="Figure 3. Five-fold comparison of the base tree, engineered tree, and neural network."><figcaption>Figure 3. Five-fold comparison of the base tree, engineered tree, and neural network.</figcaption></figure>
+<h3 id="5-5-neural-network-comparison">5.5 Neural-Network Comparison</h3>
+<p>Table 7 reports held-out results at the common threshold and at the neural threshold selected from training-only out-of-fold predictions.</p>
+<p><strong>Table 7. Held-out supervised-model comparison</strong></p>
+<table><thead><tr>
+<th>Configuration</th>
+<th>Threshold</th>
+<th>Precision</th>
+<th>Recall</th>
+<th>F1</th>
+<th>PR-AUC</th>
+<th>ROC-AUC</th>
+<th>FP</th>
+<th>FN</th>
+</tr></thead><tbody>
+<tr>
+<td>Base tree</td>
+<td>0.50</td>
+<td>0.3058</td>
+<td>0.9265</td>
+<td>0.4599</td>
+<td>0.5246</td>
+<td>0.9538</td>
+<td>143</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Engineered tree</td>
+<td>0.50</td>
+<td>0.3509</td>
+<td>0.8824</td>
+<td>0.5021</td>
+<td>0.7918</td>
+<td>0.9255</td>
+<td>111</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Neural network</td>
+<td>0.50</td>
+<td>0.2711</td>
+<td>0.8971</td>
+<td>0.4164</td>
+<td>0.6185</td>
+<td>0.9618</td>
+<td>164</td>
+<td>7</td>
+</tr>
+<tr>
+<td>Neural network, selected threshold</td>
+<td>0.86</td>
+<td>0.5281</td>
+<td>0.6912</td>
+<td>0.5987</td>
+<td>0.6185</td>
+<td>0.9618</td>
+<td>42</td>
+<td>21</td>
+</tr>
+</tbody></table>
+<p>At threshold 0.5, the neural network did not outperform the engineered tree on the failure-focused balance. Raising its threshold to 0.86 improved precision and F1 but increased missed failures from 7 to 21. This is a different operational choice rather than evidence that the network learned a better representation.</p>
+<p>Across five folds, the neural network achieved mean precision 0.2279, recall 0.8525, F1 0.3593, PR-AUC 0.5648, and ROC-AUC 0.9501. Although it had the highest mean ROC-AUC, the engineered tree was stronger on precision, recall, F1, and PR-AUC. The engineered tree was therefore retained as the main model.</p>
+<h3 id="5-6-agreement-between-anomaly-and-classification-signals">5.6 Agreement Between Anomaly and Classification Signals</h3>
+<p>Applying both methods to the same test records produced the groups in Table 8.</p>
+<p><strong>Table 8. Agreement between anomaly and classification signals</strong></p>
+<table><thead><tr>
+<th>Signal group</th>
+<th>Records</th>
+<th>Failures</th>
+<th>Observed failure rate</th>
+</tr></thead><tbody>
+<tr>
+<td>Neither</td>
+<td>1,716</td>
+<td>4</td>
+<td>0.23%</td>
+</tr>
+<tr>
+<td>Classifier only</td>
+<td>171</td>
+<td>48</td>
+<td>28.07%</td>
+</tr>
+<tr>
+<td>Anomaly only</td>
+<td>78</td>
+<td>1</td>
+<td>1.28%</td>
+</tr>
+<tr>
+<td>Both</td>
+<td>35</td>
+<td>15</td>
+<td>42.86%</td>
+</tr>
+</tbody></table>
+<p>Records flagged by both methods had the highest observed failure rate. However, the classifier-only group contained 48 failures, confirming that many known failure patterns were not globally unusual. Four failures received neither signal, so the absence of flags cannot be interpreted as guaranteed safe operation.</p>
+<h3 id="5-7-global-and-local-explanations">5.7 Global and Local Explanations</h3>
+<p>Global SHAP importance again identified rotational speed, torque, and tool wear as the main influences, with mean absolute contributions of 0.1736, 0.1606, and 0.1472, respectively.</p>
+<figure><img src="file:///Users/bijaypandey/Documents/Uni%20of%20Regina/ENSE_861/responsible_ai_project/outputs/explainable_ai/figures/shap_global_importance.png" alt="Figure 4. Global SHAP importance for the baseline failure classifier."><figcaption>Figure 4. Global SHAP importance for the baseline failure classifier.</figcaption></figure>
+<p>Local explanations made individual outcomes more concrete:</p>
+<ul>
+<li><strong>True positive:</strong> Dataset row 4,851 was correctly classified as failure with score 0.9661. Rotational speed contributed +0.4132 toward failure, while torque contributed -0.0922 in the opposite direction.</li>
+<li><strong>False positive:</strong> Dataset row 2,997 received a failure score of 0.8637 but did not fail. Torque (+0.3708) and rotational speed (+0.1350) strongly supported the false alert.</li>
+<li><strong>False negative:</strong> Dataset row 9,174 failed but received score 0.0308. Rotational speed (-0.2597) and torque (-0.1295) pushed the model toward no failure.</li>
+<li><strong>True negative:</strong> Dataset row 4,871 was correctly classified as no failure with score 0.0308.</li>
+</ul>
+<p>Figure 5 shows the missed-failure explanation. This error is operationally important because a high-confidence no-failure output could prevent a needed inspection.</p>
+<figure><img src="file:///Users/bijaypandey/Documents/Uni%20of%20Regina/ENSE_861/responsible_ai_project/outputs/explainable_ai/figures/local_false_negative_shap_lime.png" alt="Figure 5. SHAP and LIME explanations for a false negative. Positive values support failure; negative values support no failure."><figcaption>Figure 5. SHAP and LIME explanations for a false negative. Positive values support failure; negative values support no failure.</figcaption></figure>
+<h3 id="5-8-explanation-quality">5.8 Explanation Quality</h3>
+<p>Tree SHAP reconstructed all 2,000 model outputs with mean absolute error <code>3.11 x 10^-14</code> and maximum absolute error <code>3.24 x 10^-14</code>. The near-zero error shows that the contributions faithfully decompose this fitted tree's score.</p>
+<p>The selected LIME explanations were less dependable.</p>
+<p><strong>Table 9. Repeated LIME explanation audit</strong></p>
+<table><thead><tr>
+<th>Error case</th>
+<th>Mean local surrogate R2</th>
+<th>Mean top-3 overlap</th>
+<th>Minimum top-3 overlap</th>
+</tr></thead><tbody>
+<tr>
+<td>False positive</td>
+<td>0.1115</td>
+<td>1.00</td>
+<td>1.00</td>
+</tr>
+<tr>
+<td>False negative</td>
+<td>0.0970</td>
+<td>0.70</td>
+<td>0.50</td>
+</tr>
+</tbody></table>
+<p>The false-positive feature set was stable, but both surrogate-fit values were low. The false-negative feature set also changed across runs. LIME was therefore treated as an approximate second view rather than an exact explanation of the tree.</p>
+<h3 id="5-9-threshold-and-cost-sensitivity">5.9 Threshold and Cost Sensitivity</h3>
+<p>At threshold 0.5, the baseline tree detected 63 failures, produced 143 false positives, and missed 5 failures. At threshold 0.8, it detected 59 failures, produced 84 false positives, and missed 9 failures. Raising the threshold removed 59 false alarms but lost 4 correctly detected failures.</p>
+<p>The hypothetical cost analysis showed that the preferred configuration changed with the assumed relative cost of a missed failure:</p>
+<ul>
+<li>ratios 1-5 favored the classifier with failure weight 5;</li>
+<li>ratios 6-14 favored the balanced classifier at threshold 0.8; and</li>
+<li>ratios 15-50 favored the balanced classifier at threshold 0.5.</li>
+</ul>
+<p>No threshold is universally responsible. A lower threshold may be appropriate when missed failures carry severe consequences, while a higher threshold may be preferred when unnecessary shutdowns or inspections are costly. Domain experts must define these priorities.</p>
+<h2 id="6-discussion">6. Discussion</h2>
+<h3 id="6-1-anomaly-is-not-failure">6.1 Anomaly Is Not Failure</h3>
+<p>The first research question produced one of the clearest findings. Anomaly detection and classification should not be treated as interchangeable. Isolation Forest identified rare operating patterns, while the classifier recognized patterns associated with known labels. Only 16 of 68 failures were anomalous, and 48 failures appeared in the classifier-only group.</p>
+<p>Using both methods remains meaningful because they provide different evidence. Agreement identified a smaller group with a higher observed failure rate, while anomaly-only records may still deserve investigation for unfamiliar behavior. The anomaly flag should therefore be presented as supporting context, not as a failure diagnosis.</p>
+<h3 id="6-2-rare-class-performance-matters-more-than-accuracy">6.2 Rare-Class Performance Matters More Than Accuracy</h3>
+<p>The baseline classifier's 92.6% accuracy appears strong until it is considered alongside 30.58% precision. The model found most failures, but most alerts were false. In a real maintenance environment, this could consume inspection resources and eventually encourage users to dismiss warnings.</p>
+<p>At the same time, the five missed failures cannot be ignored. A model may be useful for screening while still being unsafe as an autonomous decision-maker. Reporting both error types makes the operational tradeoff visible.</p>
+<h3 id="6-3-sensor-relationships-added-useful-structure">6.3 Sensor Relationships Added Useful Structure</h3>
+<p>The engineered tree's improvement across five folds suggests that relationships between measurements contain useful predictive structure. The repeated result is stronger evidence than the single holdout comparison because it is less dependent on one partition.</p>
+<p>The interpretation must remain modest. Speed-torque ratio and power proxy are useful representations for this model; they are not newly discovered laws of equipment failure. Establishing a physical equation would require units, machine specifications, temporal measurements, and domain validation.</p>
+<h3 id="6-4-greater-complexity-did-not-guarantee-a-better-model">6.4 Greater Complexity Did Not Guarantee a Better Model</h3>
+<p>The neural network ranked records well but did not provide the best rare-class operating performance. The engineered tree was also easier to inspect through shallow rules and Tree SHAP. Consistent with the argument for interpretable models in consequential settings [10], the neural network's additional complexity was not justified by a clear practical gain.</p>
+<p>This result should not be generalized to all neural networks. AI4I is small, tabular, synthetic, and non-temporal, and only one deliberately compact architecture was tested. The value of the experiment is that model choice was based on common validation evidence rather than an assumption that deep learning must be superior.</p>
+<h3 id="6-5-explanation-is-evidence-about-the-model-not-the-machine">6.5 Explanation Is Evidence About the Model, Not the Machine</h3>
+<p>Local explanation was most useful when applied to errors. The false positive showed which learned conditions created a confident but unnecessary alert. The false negative revealed a repeated high-speed, low-torque pattern that pushed missed failures away from the failure class.</p>
+<p>SHAP was faithful to the tree calculation, but this does not prove that the tree's reasoning is physically correct. LIME generated readable local weights, but its low surrogate fit showed that readability and faithfulness are different qualities. A responsible report should communicate both the explanation and the strength of evidence behind it.</p>
+<h2 id="7-responsible-and-explainable-ai-analysis">7. Responsible and Explainable AI Analysis</h2>
+<h3 id="7-1-transparency-and-explainability">7.1 Transparency and Explainability</h3>
+<p>The system reports global feature reliance, signed local contributions, example error explanations, and the limitations of each explanation method. A human-readable explanation is structured around five questions:</p>
+<ol>
+<li>What did the model predict?</li>
+<li>What evidence supported the prediction?</li>
+<li>What evidence opposed it?</li>
+<li>What human action is appropriate?</li>
+<li>What does the explanation not establish?</li>
+</ol>
+<p>This structure makes the output more useful than a score alone without presenting the explanation as causal truth.</p>
+<h3 id="7-2-validity-reliability-and-robustness">7.2 Validity, Reliability, and Robustness</h3>
+<p>Validity was supported through a held-out test set, stratified five-fold validation, multiple rare-class metrics, and explicit leakage prevention. Robustness was explored through variation across folds, threshold sensitivity, and repeated LIME explanations. These checks align with the NIST AI RMF view that trustworthy AI requires context-aware measurement and ongoing risk management rather than a single performance value [8].</p>
+<h3 id="7-3-accountability-and-human-oversight">7.3 Accountability and Human Oversight</h3>
+<p>The prototype is framed as decision support. A qualified maintenance professional should retain authority over inspections, shutdowns, and repairs. The report documents data assumptions, model settings, error counts, explanation limitations, and hypothetical cost assumptions so that model behavior can be reviewed rather than accepted silently.</p>
+<h3 id="7-4-consequence-aware-evaluation">7.4 Consequence-Aware Evaluation</h3>
+<p>False positives and false negatives have different consequences. False positives may create unnecessary inspections, downtime, and alert fatigue. False negatives may leave a failing machine in operation. Threshold and cost-sensitivity analyses make this value judgment explicit instead of hiding it behind the default threshold.</p>
+<h3 id="7-5-fairness-scope">7.5 Fairness Scope</h3>
+<p>The dataset contains machine measurements rather than people or protected demographic attributes. Demographic fairness metrics are therefore not meaningful for this experiment. Responsible evaluation instead focuses on operational error distribution, transparency, reliability, and safety. A future system affecting workers, teams, or resource allocation would require a broader sociotechnical fairness assessment.</p>
+<h3 id="7-6-governance-boundary">7.6 Governance Boundary</h3>
+<p>The prototype demonstrates selected Responsible AI engineering practices, but it does not establish industrial compliance or production readiness. No maintenance expert approved the explanations, no formal hazard analysis was completed, and no monitoring process was deployed. Test performance and model faithfulness should not be confused with system safety [9].</p>
+<h2 id="8-limitations">8. Limitations</h2>
+<p>The evidence in this report is bounded by several limitations:</p>
+<ol>
+<li><strong>Synthetic data:</strong> AI4I represents simulated conditions rather than measurements from deployed industrial equipment [1].</li>
+<li><strong>No machine history:</strong> Records are independent and do not provide temporal degradation trajectories.</li>
+<li><strong>Limited model search:</strong> One shallow tree design and one deliberately small neural architecture were emphasized.</li>
+<li><strong>No probability calibration:</strong> Model scores should not be interpreted as verified real-world failure probabilities.</li>
+<li><strong>Small failure sample:</strong> The test set contains 68 failures and only 5 false negatives, limiting conclusions about error subgroups.</li>
+<li><strong>Post-hoc explanation limits:</strong> SHAP explains the fitted model, not physical causality. LIME showed weak local fit for audited cases.</li>
+<li><strong>No expert evaluation:</strong> Maintenance engineers did not evaluate whether the explanations were understandable or actionable.</li>
+<li><strong>Hypothetical costs:</strong> The cost ratios were sensitivity assumptions, not measured industrial values.</li>
+<li><strong>No deployment monitoring:</strong> Data drift, sensor failure, cybersecurity, runtime anomaly handling, and retraining governance were outside the project scope.</li>
+</ol>
+<p>These limitations do not remove the value of the findings. They define what the experiment can support: a reproducible course-level analysis of model behavior, not a claim of industrial safety.</p>
+<h2 id="9-future-work">9. Future Work</h2>
+<p>The most valuable next steps are:</p>
+<ul>
+<li>evaluate the workflow on real temporal machine data, such as run-to-failure histories;</li>
+<li>calibrate model scores before communicating them as probabilities;</li>
+<li>validate thresholds using maintenance costs and safety priorities supplied by domain experts;</li>
+<li>compare the shallow tree with additional interpretable models and carefully tuned nonlinear baselines;</li>
+<li>conduct a user study with maintenance professionals to evaluate explanation clarity and usefulness;</li>
+<li>monitor feature distributions, model errors, and explanation behavior over time; and</li>
+<li>define a formal human-review and audit process for high-risk or conflicting cases.</li>
+</ul>
+<h2 id="10-conclusion">10. Conclusion</h2>
+<p>This project developed an end-to-end Responsible and Explainable AI study for predictive maintenance. The work began with a simple question about abnormal machine behavior and developed into a broader investigation of failure prediction, model comparison, sensor relationships, error consequences, and explanation quality.</p>
+<p>The experiments showed that anomaly detection and failure classification provide different information. Isolation Forest identified unusual operation but missed most labeled failures. The decision tree detected 63 of 68 failures, although its 143 false alarms exposed an important precision problem. Interpretable sensor relationships improved repeated F1 without reducing mean recall. The neural network offered strong ranking performance but did not outperform the engineered tree on the main failure-focused measures.</p>
+<p>The explanation analysis added a second layer of accountability. SHAP made the tree's global and local behavior inspectable and reconstructed its outputs faithfully. LIME provided an understandable alternative view, but its weak local fit demonstrated why explanation methods must be evaluated rather than displayed uncritically. Examining false alarms and missed failures made the model's limitations more concrete than aggregate metrics alone.</p>
+<p>The main lesson is that responsible predictive maintenance is not achieved by adding an explanation chart after training. It comes from the whole workflow: leakage-safe data preparation, suitable metrics, repeated validation, interpretable model comparison, explicit error tradeoffs, explanation audits, human decision authority, and honest limits. The resulting prototype is not ready to control industrial maintenance, but it demonstrates a defensible way to study how predictive performance and human understanding can be developed together.</p>
+<h2 id="references" class="major-break">References</h2>
+<p>[1] S. Matzka, "Explainable Artificial Intelligence for Predictive Maintenance Applications," in <em>2020 Third International Conference on Artificial Intelligence for Industries (AI4I)</em>, 2020, pp. 69-74, doi: 10.1109/AI4I49448.2020.00023.</p>
+<p>[2] L. Cummins, A. Sommers, S. B. Ramezani, S. Mittal, J. E. Jabour, M. Seale, and S. Rahimi, "Explainable Predictive Maintenance: A Survey of Current Methods, Challenges and Opportunities," <em>IEEE Access</em>, vol. 12, pp. 57574-57602, 2024, doi: 10.1109/ACCESS.2024.3391130.</p>
+<p>[3] F. T. Liu, K. M. Ting, and Z.-H. Zhou, "Isolation Forest," in <em>Proc. 8th IEEE Int. Conf. Data Mining (ICDM)</em>, Pisa, Italy, 2008, pp. 413-422, doi: 10.1109/ICDM.2008.17.</p>
+<p>[4] M. T. Ribeiro, S. Singh, and C. Guestrin, "'Why Should I Trust You?': Explaining the Predictions of Any Classifier," in <em>Proc. 22nd ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining</em>, San Francisco, CA, USA, 2016, pp. 1135-1144, doi: 10.1145/2939672.2939778.</p>
+<p>[5] S. M. Lundberg and S.-I. Lee, "A Unified Approach to Interpreting Model Predictions," in <em>Advances in Neural Information Processing Systems 30</em>, Long Beach, CA, USA, 2017, pp. 4765-4774.</p>
+<p>[6] D. Alvarez-Melis and T. S. Jaakkola, "On the Robustness of Interpretability Methods," in <em>Proc. ICML Workshop on Human Interpretability in Machine Learning</em>, Stockholm, Sweden, 2018. [Online]. Available: <a href="https://arxiv.org/abs/1806.08049">https://arxiv.org/abs/1806.08049</a>.</p>
+<p>[7] F. Doshi-Velez and B. Kim, "Towards a Rigorous Science of Interpretable Machine Learning," arXiv:1702.08608, 2017. [Online]. Available: <a href="https://arxiv.org/abs/1702.08608">https://arxiv.org/abs/1702.08608</a>.</p>
+<p>[8] E. Tabassi, <em>Artificial Intelligence Risk Management Framework (AI RMF 1.0)</em>. Gaithersburg, MD, USA: National Institute of Standards and Technology, NIST AI 100-1, Jan. 2023, doi: 10.6028/NIST.AI.100-1.</p>
+<p>[9] S. Mohseni, H. Wang, C. Xiao, Z. Yu, Z. Wang, and J. Yadawa, "Taxonomy of Machine Learning Safety: A Survey and Primer," <em>ACM Comput. Surv.</em>, vol. 55, no. 8, Art. no. 157, pp. 1-38, 2023, doi: 10.1145/3551385.</p>
+<p>[10] C. Rudin, "Stop Explaining Black Box Machine Learning Models for High Stakes Decisions and Use Interpretable Models Instead," <em>Nature Machine Intelligence</em>, vol. 1, pp. 206-215, 2019, doi: 10.1038/s42256-019-0048-x.</p>
+<p>[11] R. Guidotti, A. Monreale, S. Ruggieri, F. Turini, F. Giannotti, and D. Pedreschi, "A Survey of Methods for Explaining Black Box Models," <em>ACM Comput. Surv.</em>, vol. 51, no. 5, Art. no. 93, pp. 1-42, 2018, doi: 10.1145/3236009.</p>
+<p>[12] D. E. Rumelhart, G. E. Hinton, and R. J. Williams, "Learning Representations by Back-Propagating Errors," <em>Nature</em>, vol. 323, pp. 533-536, 1986, doi: 10.1038/323533a0.</p>
+<p>[13] D. P. Kingma and J. Ba, "Adam: A Method for Stochastic Optimization," in <em>Proc. 3rd Int. Conf. Learning Representations</em>, San Diego, CA, USA, 2015. [Online]. Available: <a href="https://arxiv.org/abs/1412.6980">https://arxiv.org/abs/1412.6980</a>.</p>
+<hr>
+<h2 id="appendix-a-reproducibility-and-project-artifacts" class="major-break">Appendix A. Reproducibility and Project Artifacts</h2>
+<p>The analysis is organized in the following notebooks:</p>
+<ol>
+<li><code>src/01_data_exploration/data_exploration.ipynb</code></li>
+<li><code>src/02_data_preprocessing/data_preprocessing.ipynb</code></li>
+<li><code>src/03_anomaly_detection/anomaly_detection.ipynb</code></li>
+<li><code>src/04_failure_classification/failure_classification.ipynb</code></li>
+<li><code>src/05_neural_network/neural_network_comparison.ipynb</code></li>
+<li><code>src/06_feature_relationship_analysis/feature_relationship_analysis.ipynb</code></li>
+<li><code>src/07_explainable_ai/lime_shap_explainability.ipynb</code></li>
+<li><code>src/08_integrated_research_analysis/integrated_research_analysis.ipynb</code></li>
+</ol>
+<p>The project uses Python, pandas, NumPy, scikit-learn, Matplotlib, seaborn, SHAP, and LIME. Generated tables and figures are stored under <code>outputs/</code>. A complete reproducibility guide is available in <code>docs/reproducibility_guide.md</code>.</p>
+</body>
+</html>

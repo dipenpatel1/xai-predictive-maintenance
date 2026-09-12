@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title description">
+  <title id="title">Predictive Maintenance Research Workflow</title>
+  <desc id="description">Eight-stage workflow from data exploration through explanation and decision-tradeoff evaluation.</desc>
+
+  <defs>
+    <filter id="shadow" x="-10%" y="-15%" width="120%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="6" flood-color="#18313a" flood-opacity="0.13"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L12,6 L0,12 Z" fill="#60747c"/>
+    </marker>
+    <style>
+      .title { font: 700 42px Arial, Helvetica, sans-serif; fill: #202a30; }
+      .subtitle { font: 400 21px Arial, Helvetica, sans-serif; fill: #66767d; }
+      .step { font: 700 17px Arial, Helvetica, sans-serif; fill: #ffffff; letter-spacing: 1px; }
+      .heading { font: 700 24px Arial, Helvetica, sans-serif; fill: #202a30; }
+      .detail { font: 400 17px Arial, Helvetica, sans-serif; fill: #52636a; }
+      .arrow { fill: none; stroke: #60747c; stroke-width: 5; stroke-linecap: round; marker-end: url(#arrow); }
+      .box { stroke-width: 2; rx: 10; filter: url(#shadow); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <text x="800" y="70" text-anchor="middle" class="title">Predictive Maintenance Research Workflow</text>
+  <text x="800" y="108" text-anchor="middle" class="subtitle">From raw sensor data to explainable and responsible decision support</text>
+
+  <!-- Top-row arrows -->
+  <path class="arrow" d="M400 272 H445"/>
+  <path class="arrow" d="M775 272 H820"/>
+  <path class="arrow" d="M1150 272 H1195"/>
+
+  <!-- Turn from row one to row two -->
+  <path class="arrow" d="M1365 365 V510"/>
+
+  <!-- Bottom-row arrows, read right to left -->
+  <path class="arrow" d="M1195 625 H1150"/>
+  <path class="arrow" d="M820 625 H775"/>
+  <path class="arrow" d="M445 625 H400"/>
+
+  <!-- Step 1 -->
+  <g>
+    <rect class="box" x="70" y="180" width="330" height="185" fill="#e9f2f8" stroke="#2d6fa4"/>
+    <rect x="70" y="180" width="330" height="48" rx="10" fill="#2d6fa4"/>
+    <rect x="70" y="213" width="330" height="15" fill="#2d6fa4"/>
+    <text x="95" y="211" class="step">01  DATA</text>
+    <text x="235" y="273" text-anchor="middle" class="heading">Data exploration</text>
+    <text x="235" y="310" text-anchor="middle" class="detail">Understand features, quality,</text>
+    <text x="235" y="336" text-anchor="middle" class="detail">and failure imbalance</text>
+  </g>
+
+  <!-- Step 2 -->
+  <g>
+    <rect class="box" x="445" y="180" width="330" height="185" fill="#e9f2f8" stroke="#2d6fa4"/>
+    <rect x="445" y="180" width="330" height="48" rx="10" fill="#2d6fa4"/>
+    <rect x="445" y="213" width="330" height="15" fill="#2d6fa4"/>
+    <text x="470" y="211" class="step">02  PREPARATION</text>
+    <text x="610" y="260" text-anchor="middle" class="heading">Leakage-safe</text>
+    <text x="610" y="290" text-anchor="middle" class="heading">preprocessing</text>
+    <text x="610" y="327" text-anchor="middle" class="detail">Split, encode, and scale fairly</text>
+  </g>
+
+  <!-- Step 3 -->
+  <g>
+    <rect class="box" x="820" y="180" width="330" height="185" fill="#e4f2ef" stroke="#237470"/>
+    <rect x="820" y="180" width="330" height="48" rx="10" fill="#237470"/>
+    <rect x="820" y="213" width="330" height="15" fill="#237470"/>
+    <text x="845" y="211" class="step">03  UNUSUALNESS</text>
+    <text x="985" y="273" text-anchor="middle" class="heading">Anomaly detection</text>
+    <text x="985" y="310" text-anchor="middle" class="detail">Find behavior that differs</text>
+    <text x="985" y="336" text-anchor="middle" class="detail">from normal operation</text>
+  </g>
+
+  <!-- Step 4 -->
+  <g>
+    <rect class="box" x="1195" y="180" width="330" height="185" fill="#e4f2ef" stroke="#237470"/>
+    <rect x="1195" y="180" width="330" height="48" rx="10" fill="#237470"/>
+    <rect x="1195" y="213" width="330" height="15" fill="#237470"/>
+    <text x="1220" y="211" class="step">04  PREDICTION</text>
+    <text x="1360" y="260" text-anchor="middle" class="heading">Failure</text>
+    <text x="1360" y="290" text-anchor="middle" class="heading">classification</text>
+    <text x="1360" y="327" text-anchor="middle" class="detail">Learn known failure patterns</text>
+  </g>
+
+  <!-- Step 5 -->
+  <g>
+    <rect class="box" x="1195" y="535" width="330" height="185" fill="#fff0e3" stroke="#d5792e"/>
+    <rect x="1195" y="535" width="330" height="48" rx="10" fill="#d5792e"/>
+    <rect x="1195" y="568" width="330" height="15" fill="#d5792e"/>
+    <text x="1220" y="566" class="step">05  RELATIONSHIPS</text>
+    <text x="1360" y="615" text-anchor="middle" class="heading">Feature-relationship</text>
+    <text x="1360" y="645" text-anchor="middle" class="heading">analysis</text>
+    <text x="1360" y="682" text-anchor="middle" class="detail">Study sensors together</text>
+  </g>
+
+  <!-- Step 6 -->
+  <g>
+    <rect class="box" x="820" y="535" width="330" height="185" fill="#edf3e8" stroke="#4f825d"/>
+    <rect x="820" y="535" width="330" height="48" rx="10" fill="#4f825d"/>
+    <rect x="820" y="568" width="330" height="15" fill="#4f825d"/>
+    <text x="845" y="566" class="step">06  COMPARISON</text>
+    <text x="985" y="615" text-anchor="middle" class="heading">Neural-network</text>
+    <text x="985" y="645" text-anchor="middle" class="heading">comparison</text>
+    <text x="985" y="682" text-anchor="middle" class="detail">Test whether complexity helps</text>
+  </g>
+
+  <!-- Step 7 -->
+  <g>
+    <rect class="box" x="445" y="535" width="330" height="185" fill="#f4ecf6" stroke="#7b5b8e"/>
+    <rect x="445" y="535" width="330" height="48" rx="10" fill="#7b5b8e"/>
+    <rect x="445" y="568" width="330" height="15" fill="#7b5b8e"/>
+    <text x="470" y="566" class="step">07  EXPLANATION</text>
+    <text x="610" y="615" text-anchor="middle" class="heading">SHAP and LIME</text>
+    <text x="610" y="645" text-anchor="middle" class="heading">explanation</text>
+    <text x="610" y="682" text-anchor="middle" class="detail">Inspect global and local behavior</text>
+  </g>
+
+  <!-- Step 8 -->
+  <g>
+    <rect class="box" x="70" y="535" width="330" height="185" fill="#fbe9e7" stroke="#ad4d48"/>
+    <rect x="70" y="535" width="330" height="48" rx="10" fill="#ad4d48"/>
+    <rect x="70" y="568" width="330" height="15" fill="#ad4d48"/>
+    <text x="95" y="566" class="step">08  RESPONSIBLE USE</text>
+    <text x="235" y="605" text-anchor="middle" class="heading">Explanation and</text>
+    <text x="235" y="635" text-anchor="middle" class="heading">decision-tradeoff</text>
+    <text x="235" y="665" text-anchor="middle" class="heading">evaluation</text>
+    <text x="235" y="699" text-anchor="middle" class="detail">Evaluate errors, limits, and choices</text>
+  </g>
+
+  <rect x="210" y="785" width="1180" height="64" rx="10" fill="#f2f6f7" stroke="#cbd7da" stroke-width="2"/>
+  <text x="800" y="825" text-anchor="middle" class="detail">
+    Final outcome: a transparent decision-support prototype, not an autonomous maintenance system
+  </text>
+</svg>

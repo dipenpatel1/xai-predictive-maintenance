@@ -1,336 +1,452 @@
-# Presentation Outline
+# Simple Final Presentation Outline (12 Slides)
+
+Suggested duration: 10-12 minutes, followed by questions.
+
+The main presentation focuses on the central project story. More advanced
+experiments, such as the neural-network comparison and detailed explanation
+evaluation, can be kept as backup material.
 
 ## Slide 1: Title
 
-**Explainable Predictive Maintenance Using Anomaly Detection, Failure Classification, and Explanation Evaluation**
+### Put on the slide
 
-Presenter: Bijay Pandey  
-Course: Responsible and Explainable AI
+**Explainable Predictive Maintenance Using Machine Learning**
 
-Speaker note:
+- Bijay Pandey - Student ID: `[add ID]`
+- `[Add other group members and IDs, or remove this line]`
+- Responsible and Explainable AI
+- University of Regina
 
-This project studies how machine learning can support predictive maintenance while making model behavior understandable and responsible.
+### What to say
 
-## Slide 2: Problem Motivation
+Good morning. My project studies how machine learning can identify unusual
+machine behavior and possible failures. It also explores how explanations can
+help users understand the model's output.
 
-Main points:
+## Slide 2: Introduction
 
-- Industrial machine failures can cause downtime, cost, and safety concerns.
-- Predictive maintenance uses sensor data to identify abnormal behavior and possible failure.
-- A useful system should not only predict, but also explain why a machine is risky.
+### Put on the slide
 
-The project asks more than:
-Can a model predict machine failure?
+### Problem
 
-It asks:
-How are anomalies different from failures?
-Which features influence predictions?
-Where does the classifier fail?
-Are explanations faithful and stable?
-How do error consequences affect model selection?
+- Machine failure can cause downtime, cost, and safety concerns.
+- Sensor data can help identify problems before failure occurs.
+- A prediction is more useful when users can understand why it was made.
 
-Speaker note:
+### Motivation
 
-The focus is not just model accuracy. The project asks how to make predictive maintenance outputs understandable and useful for decision support.
+Build a small predictive-maintenance prototype that is understandable and
+supports human decision-making.
 
-## Slide 3: Dataset
+### Simple visual
 
-Dataset: AI4I 2020 Predictive Maintenance Dataset
+```text
+Machine sensors -> Machine-learning model -> Prediction + explanation
+```
 
-Key details:
+### What to say
+
+Predictive maintenance uses information such as temperature, rotational
+speed, torque, and tool wear. My motivation was to study both prediction and
+explanation instead of considering accuracy alone.
+
+## Slide 3: Project Objectives
+
+### Put on the slide
+
+1. Explore and prepare industrial sensor data.
+2. Detect machine records with unusual behavior.
+3. Classify records as failure or no failure.
+4. Study relationships between sensor features.
+5. Explain important features and individual predictions.
+6. Discuss the results using Responsible AI principles.
+
+### What to say
+
+The project has two related machine-learning tasks. Anomaly detection asks
+whether a record looks unusual. Classification asks whether a record matches
+known failure examples. I then use explainability to understand the results.
+
+## Slide 4: Brief Literature Review
+
+### Put on the slide
+
+```text
+Predictive maintenance      Explainable AI       This project
+        |                         |                    |
+Detect problems early  +  Explain predictions  ->  Responsible prototype
+```
+
+- Matzka introduced the AI4I dataset for explainable predictive maintenance
+  [1].
+- Cummins et al. showed the importance of understandable outputs in
+  predictive maintenance [2].
+- Isolation Forest identifies unusual observations [3].
+- SHAP and LIME explain how features influence model predictions [4], [5].
+
+### What to say
+
+The literature shows that predictive-maintenance models should not only
+produce outputs. Operators should also be able to understand the main reasons
+behind those outputs. These studies guided my choice of dataset, anomaly
+detection, and explanation methods.
+
+## Slide 5: Dataset and Methodology
+
+### Put on the slide
+
+### AI4I 2020 dataset
 
 - 10,000 machine records
-- Failure rate: about 3.39%
-- Input features:
-  - machine type
-  - air temperature
-  - process temperature
-  - rotational speed
-  - torque
-  - tool wear
-
-Important data decision:
-
-- Failure-mode columns were excluded from inputs to avoid data leakage.
-
-Speaker note:
-
-The dataset is imbalanced, which means accuracy alone can be misleading. I avoided using failure-mode labels as input features because that would leak the answer into the model.
-
-## Slide 4: Project Workflow
-
-Show workflow:
+- 339 failure records, or 3.39%
+- Features: machine type, temperatures, speed, torque, and tool wear
+- Target: machine failure
 
 ```text
-Data Exploration
-      ->
-Preprocessing
-      ->
-Anomaly Detection
-      ->
-Failure Classification
-      ->
-Feature Relationship Analysis
-      ->
-SHAP and LIME Explanation
-      ->
-Validation and Responsible AI Interpretation
-      ->
-Neural Network Comparison
+Explore data -> Prepare data -> Detect anomalies -> Classify failures
+             -> Study feature relationships -> Explain results
 ```
 
-Speaker note:
+**Tools:** Python, Jupyter Notebook, pandas, scikit-learn, Matplotlib,
+SHAP, and LIME.
 
-The work was developed in stages. First I studied abnormal behavior, then supervised failure prediction, then feature relationships and model tradeoffs.
+### What to say
 
-## Slide 5: Anomaly Detection
+I removed identifier and failure-mode columns from the model inputs. The
+failure-mode columns were excluded because they already contain information
+about the target and could cause data leakage. I split the data into training
+and testing sets while preserving the small failure percentage.
 
-Question:
+## Slide 6: Anomaly Detection Results
 
-```text
-Does this machine behavior look unusual?
-```
+### Put on the slide
 
-Results:
+**Question:** Does this machine record look unusual?
 
-- Test records: 2000
-- Records flagged as anomalous: 113
-- Actual failures in test set: 68
-- Failures flagged as anomalous: 16
-
-Recommended visual:
-
-```text
-outputs/report_artifacts/anomaly_score_distribution.png
-```
-
-Speaker note:
-
-Anomaly detection identified some failure-related abnormal behavior, but it did not catch all failures. This shows anomaly detection is useful for abnormal-behavior detection, not as a complete failure classifier.
-
-## Slide 6: Anomaly and Classification Are Different
-
-Same-record comparison:
-
-| Signal group | Records | Failures | Failure rate |
-|---|---:|---:|---:|
-| Neither | 1716 | 4 | 0.23% |
-| Classifier only | 171 | 48 | 28.07% |
-| Anomaly only | 78 | 1 | 1.28% |
-| Both | 35 | 15 | 42.86% |
-
-Recommended visual:
-
-```text
-outputs/integrated_research_analysis/figures/signal_agreement_matrix.png
-```
-
-Speaker note:
-
-The methods answer different questions. Agreement identifies a group with a higher observed failure rate, but many known failures are detected only by the classifier. Anomaly does not mean failure, and no flag does not guarantee safety.
-
-## Slide 7: Failure Classification
-
-Question:
-
-```text
-Does this record indicate failure or no failure?
-```
-
-Results:
-
-| Metric | Value |
+| Result on 2,000 test records | Count |
 |---|---:|
-| Accuracy | 0.9260 |
-| Precision | 0.3058 |
-| Recall | 0.9265 |
-| F1-score | 0.4599 |
+| Records flagged as unusual | 113 |
+| Actual failures | 68 |
+| Failures also flagged as unusual | 16 |
 
-Recommended visual:
+### Visual
+
+Use:
+
+`outputs/report_artifacts/anomaly_score_distribution.png`
+
+### Main finding
+
+**Unusual behavior is not always failure, and failure is not always unusual.**
+
+### What to say
+
+I used Isolation Forest to identify records that were different from normal
+machine behavior. It found some failures, but most failures were not flagged
+as anomalies. It also flagged normal records. Therefore, anomaly detection is
+useful for finding unusual conditions, but it should not be treated as a
+complete failure predictor.
+
+## Slide 7: Failure Classification Results
+
+### Put on the slide
+
+**Question:** Does this record match a known failure pattern?
+
+| Metric | Result |
+|---|---:|
+| Accuracy | 92.60% |
+| Precision | 30.58% |
+| Recall | 92.65% |
+| F1-score | 45.99% |
+
+- Detected 63 of 68 failures
+- Missed 5 failures
+- Produced 143 false alarms
+
+### Visual
+
+Use:
+
+`outputs/report_artifacts/classification_confusion_matrix.png`
+
+### What to say
+
+Recall tells us how many real failures were detected. The model detected about
+93% of them, which is useful. Precision tells us how many failure alarms were
+correct. Precision was lower because the model produced many false alarms.
+This shows why accuracy alone is not enough for an imbalanced dataset.
+
+## Slide 8: Neural Network Experiment
+
+### Put on the slide
+
+A small feedforward neural network was added as a nonlinear benchmark:
 
 ```text
-outputs/report_artifacts/classification_confusion_matrix.png
+8 inputs -> 16 ReLU -> 8 ReLU -> 1 sigmoid
 ```
 
-Speaker note:
+It used balanced sample weights, Adam optimization, regularization, and early
+stopping. Three supervised classification models were then compared:
 
-The classifier caught most actual failures, but it produced many false alarms. This creates a useful Responsible AI discussion about recall versus precision.
+- **Base decision tree:** original sensor features
+- **Engineered decision tree:** original features plus sensor relationships
+- **Neural network:** small nonlinear comparison model
 
-## Slide 8: SHAP and LIME Explanations
+| Five-fold mean | Precision | Recall | F1 |
+|---|---:|---:|---:|
+| Base decision tree | 0.2256 | **0.9204** | 0.3621 |
+| Engineered decision tree | **0.3552** | 0.9203 | **0.5119** |
+| Neural network | 0.2279 | 0.8525 | 0.3593 |
 
-Global SHAP ranking:
+**Selected model:** engineered decision tree
 
-1. Rotational speed
-2. Torque
-3. Tool wear
+### Visual
 
-Local cases studied:
+Use:
 
-- true positive
-- false positive
-- false negative
-- true negative
+`outputs/neural_network_comparison/figures/five_fold_neural_comparison.png`
 
-Recommended visual:
+### What to say
 
-```text
-outputs/explainable_ai/figures/shap_global_importance.png
-```
-
-Speaker note:
-
-SHAP explains how each feature moves a prediction away from the model baseline. LIME fits an approximate local model. The methods were compared rather than treated as interchangeable.
+I compared two decision trees and a small feedforward neural network using the
+same five-fold evaluation. The neural network was included to test whether a
+more complex nonlinear model would improve failure prediction. The engineered
+tree achieved the strongest average precision and F1 while maintaining almost
+the same recall as the base tree. The neural network did not improve these
+failure-focused metrics. Therefore, I retained the engineered tree because it
+provided the best performance and was also easier to explain.
 
 ## Slide 9: Feature Relationships
 
-Study relationships between features, not only individual features.
+### Put on the slide
 
-Engineered features:
+Important original features:
+
+- rotational speed
+- torque
+- tool wear
+
+Simple relationships studied:
 
 - temperature difference
-- power proxy
-- wear-torque interaction
-- speed-torque ratio
+- speed and torque together
+- tool wear and torque together
 
-Recommended visual:
+**Finding:** Adding understandable feature relationships improved average F1
+from **0.36 to 0.51** across five validation runs.
 
-```text
-outputs/feature_relationships/feature_correlation_matrix.png
-```
+### Visual
 
-Speaker note:
+Use:
 
-This step asks whether machine failure is related to combinations of features. For example, torque and rotational speed together approximate a power-like relationship.
+`outputs/feature_relationships/feature_correlation_matrix.png`
 
-```text
-Temperature difference = Process temperature - Air temperature
-Power proxy = Torque x Rotational speed
-Wear-load interaction = Tool wear x Torque
-Speed-load ratio = Rotational speed / (Torque + epsilon)
-```
+### What to say
 
-These are interpretable candidate relationships, not discovered physical equations. The speed-torque ratio had only 0.063 correlation with failure but became the engineered tree's most-used feature, demonstrating that low linear correlation does not rule out useful nonlinear thresholds.
+My professor suggested studying relationships between features instead of
+looking at each feature separately. For example, the combination of speed and
+torque may describe machine load better than either feature alone. Some useful
+relationships had low simple correlation because the classifier could learn
+nonlinear decision rules. I repeated the experiment on five data splits and
+used the average result rather than depending on one split.
 
-## Slide 10: Five-Fold Feature Results
+## Slide 10: Global Explanation With SHAP
 
-Model comparison:
+### Put on the slide
 
-| Model | Mean precision | Mean recall | Mean F1 |
+### Explainable AI
+
+- **SHAP:** shows how each feature pushes a prediction toward or away from
+  failure.
+- Main influential features: rotational speed, torque, and tool wear.
+- The global chart summarizes average absolute influence across test records.
+
+### Visual
+
+Use:
+
+`outputs/explainable_ai/figures/shap_global_importance.png`
+
+### What to say
+
+SHAP helped me understand overall feature influence and individual
+predictions. The chart uses absolute contribution size, so it shows the amount
+of influence but not its direction. SHAP explains what the model learned, but
+it does not prove that a feature physically caused a failure or guarantee that
+the prediction is correct.
+
+## Slide 11: Local Explanation With LIME
+
+### Put on the slide
+
+- LIME creates nearby artificial records around one selected case.
+- It asks the classifier for predictions and fits a weighted local surrogate.
+- Positive and negative weights show which conditions support or oppose the
+  local prediction.
+- The displayed case is a false negative: an actual failure predicted as
+  no failure.
+
+**Fidelity finding:** repeated false-negative explanations had mean local
+surrogate \(R^2 = 0.097\) and mean top-three feature overlap of 0.70.
+
+### Visual
+
+Use:
+
+`outputs/explainable_ai/figures/local_false_negative_shap_lime.png`
+
+### What to say
+
+LIME provides a readable local explanation, but it is only an approximation of
+the classifier around one record. I evaluated this approximation instead of
+assuming it was reliable. Its low mean local R-squared for false-negative cases
+shows weak fidelity, so I treat LIME as supporting evidence rather than ground
+truth. This is itself a Responsible AI result: explanations must be evaluated,
+not merely displayed.
+
+## Slide 12: Threshold Tuning and Responsible AI
+
+### Put on the slide
+
+**The threshold decides when a failure alarm is raised.**
+
+| Threshold | Correctly detected failures | False alarms | Missed failures |
 |---|---:|---:|---:|
-| Base features | 0.2256 | 0.9204 | 0.3621 |
-| Base + engineered | 0.3552 | 0.9203 | 0.5119 |
-
-Recommended visual:
+| 0.5 | 63 of 68 | 143 | 5 |
+| 0.8 | 59 of 68 | 84 | 9 |
 
 ```text
-outputs/integrated_research_analysis/figures/five_fold_model_comparison.png
+Lower threshold -> catch more failures, but create more false alarms
+Higher threshold -> fewer false alarms, but miss more failures
 ```
 
-Speaker note:
+### Responsible AI connection
 
-The engineered features improved mean precision and F1 while maintaining almost identical mean recall across five data splits. This is stronger evidence than reporting only the best holdout result.
+- Do not accept the default threshold without examining its consequences.
+- Report both false alarms and missed failures.
+- Choose the threshold according to the real maintenance context.
+- Keep the system as decision support rather than an autonomous decision-maker.
 
-## Slide 11: Neural Network Comparison
+### Visual
 
-Five-fold mean results:
+Use:
 
-| Model | Precision | Recall | F1 | PR-AUC | ROC-AUC |
-|---|---:|---:|---:|---:|---:|
-| Base tree | 0.2256 | 0.9204 | 0.3621 | 0.4584 | 0.9250 |
-| Engineered tree | 0.3552 | 0.9203 | 0.5119 | 0.7885 | 0.9439 |
-| Neural network | 0.2279 | 0.8525 | 0.3593 | 0.5648 | 0.9501 |
+`outputs/model_tuning/threshold_tuning_precision_recall_f1.png`
 
-Recommended visual:
+### What to say
 
-```text
-outputs/neural_network_comparison/figures/model_precision_recall_comparison.png
-```
+The classifier produces a score, and the threshold converts that score into a
+failure or no-failure decision. At the default threshold of 0.5, the model
+caught more failures but produced 143 false alarms. At 0.8, false alarms fell
+to 84, but missed failures increased from 5 to 9. Threshold 0.8 is not always
+better. A responsible choice depends on whether missing a failure or ordering
+an unnecessary inspection has the more serious consequence. In a real system,
+maintenance experts should help define that choice.
 
-Speaker note:
+## Slide 13: Conclusion, Limitations, and Future Work
 
-The neural network achieved the highest ROC-AUC, but the engineered tree remained stronger on precision, recall, F1, and PR-AUC. The additional complexity therefore did not justify replacing the more interpretable tree. The network remains useful as a nonlinear benchmark and post-hoc explanation case study.
+### Put on the slide
 
-## Slide 12: Responsible AI Tradeoff
+### Conclusion
 
-Main tradeoff:
+- Anomaly detection and failure classification answer different questions.
+- Classification detected most known failures but produced false alarms.
+- The engineered tree performed better than the neural network on the main
+  failure-focused metrics.
+- Feature relationships improved the classification result.
+- SHAP and LIME made model behavior easier to examine.
+- Threshold tuning showed the tradeoff between false alarms and missed failures.
+- Responsible evaluation requires more than accuracy.
 
-```text
-Catch more failures
-      vs
-Reduce false alarms
-```
+### Limitations
 
-Cost-sensitivity result:
+- The dataset is synthetic.
+- There is no time history for individual machines.
+- No maintenance expert evaluated the explanations.
 
-- Missed-failure cost ratio 1-5: failure weight 5
-- Ratio 6-14: threshold 0.8
-- Ratio 15 or greater: high-recall threshold 0.5
+### Future work
 
-Recommended visual:
+- test on real machine data
+- include time-series information
+- obtain expert feedback on explanations
 
-```text
-outputs/integrated_research_analysis/figures/cost_sensitivity.png
-```
+**Thank you. Questions?**
 
-Speaker note:
+### What to say
 
-There is no universally responsible threshold. The preferred setting changes with the assumed consequences of missed failures and false alarms. These ratios are sensitivity assumptions, not real industrial cost estimates.
+The main conclusion is that unusual behavior and machine failure are not the
+same problem. Combining classification with understandable feature analysis
+provides more useful information. However, this remains a research prototype,
+not a system ready for real industrial deployment.
 
-## Slide 13: Conclusion and Next Steps
+## Simple Q&A Preparation
 
-Conclusion:
+### Why did you use both anomaly detection and classification?
 
-- Anomaly detection identifies abnormal behavior.
-- Classification detects known failures more effectively.
-- Feature relationships improve interpretability.
-- Engineered features improve five-fold F1.
-- The neural network does not automatically outperform the interpretable tree.
-- SHAP is faithful to the fitted tree.
-- Selected LIME explanations have weak local surrogate fit.
-- Model tuning reveals cost-dependent tradeoffs.
-- The system should be used as decision support, not autonomous decision-making.
+They answer different questions. Anomaly detection finds unusual records,
+while classification finds patterns similar to labeled failures.
 
-Future work:
+### Why is accuracy not enough?
 
-- probability calibration
-- testing on real industrial data
-- explanation evaluation with maintenance experts
-- temporal validation using machine histories
-- broader neural-network architecture evaluation
+Only 3.39% of records are failures. Accuracy is strongly influenced by the
+large number of normal records, so recall, precision, and F1 are also needed.
 
-Speaker note:
+### Why did the model produce many false alarms?
 
-The main takeaway is that responsible predictive maintenance requires more than accuracy or a readable explanation. It requires error analysis, explanation evaluation, validation across splits, and clear communication of limitations.
+Failures are rare, and the model was designed to prioritize detecting them.
+Catching more failures generally increases the number of normal records that
+are incorrectly flagged.
 
-## Optional Backup Slide: Key Numbers
+### What is the difference between SHAP and LIME?
 
-Anomaly detection:
+SHAP assigns feature contributions relative to a model baseline. LIME builds
+a simple approximate model near one selected prediction.
 
-- 113 anomalies flagged
-- 16 of 68 failures flagged
+### Does SHAP identify the physical cause of failure?
 
-Classification:
+No. It explains how the trained model used the features. Physical causality
+would require domain knowledge and additional experiments.
 
-- 63 of 68 failures detected
-- 143 false alarms
+### What makes the project Responsible AI?
 
-Engineered model:
+It reports important errors, prevents data leakage, explains predictions,
+tests results on multiple splits, examines the consequences of changing the
+decision threshold, communicates limitations, and does not recommend
+autonomous use.
 
-- false alarms reduced from 143 to 111
-- missed failures increased from 5 to 8
+### Which threshold is the best?
 
-Class weight 5:
+There is no universally best threshold. A lower threshold prioritizes catching
+failures, while a higher threshold reduces false alarms. The choice should be
+based on maintenance costs, safety requirements, and expert judgment.
 
-- false alarms reduced to 78
-- detected 58 of 68 failures
+### Why did you include a neural network?
 
-Explanation audit:
+The neural network was an additional nonlinear comparison based on concepts
+covered in the course. It tested whether additional complexity improved the
+result. The engineered decision tree had better five-fold precision, recall,
+and F1 and was easier to explain, so it remained the main model.
 
-- SHAP mean reconstruction error: approximately 3.11 x 10^-14
-- LIME mean surrogate R2: 0.1115 for FP and 0.0970 for FN
+## Optional Backup Material
 
-Neural-network comparison:
+Keep these outside the main 13-slide presentation and show them only if a
+question requires more detail:
 
-- default threshold: precision 0.2711, recall 0.8971, F1 0.4164
-- training-selected threshold 0.86: precision 0.5281, recall 0.6912, F1 0.5987
-- selected threshold reduces false alarms but increases missed failures to 21
+1. Detailed neural-network architecture and learning curve.
+2. ROC-AUC and PR-AUC comparison table.
+3. True-positive, false-positive, false-negative, and true-negative SHAP/LIME
+   examples.
+4. Detailed explanation faithfulness and stability results.
+5. Detailed error-cost analysis.
+
+## Presentation Style
+
+- Use one main image and no more than four or five bullets per slide.
+- Explain results in ordinary language before mentioning technical terms.
+- Do not show code or notebook screenshots in the main presentation.
+- Do not memorize every number. Remember the meaning of the main results.
+- It is acceptable to say that an advanced analysis was exploratory and that
+  it would need more study before deployment.
+- Aim for about 45-60 seconds per slide.
