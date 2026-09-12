@@ -6,3 +6,4 @@ seaborn>=0.13
 ucimlrepo>=0.0.7
 shap>=0.45
 lime>=0.2.0.1
+python-pptx>=1.0
