@@ -1,96 +1,92 @@
-# Explainable Predictive Maintenance
+# Predictive Maintenance with Explainable AI (XAI)
 
-This repository is being built for a Responsible and Explainable AI course project.
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue)
+![Domain](https://img.shields.io/badge/Domain-Industrial_Predictive_Maintenance-orange)
+![XAI](https://img.shields.io/badge/Explainable_AI-SHAP_%26_LIME-brightgreen)
+![Dataset](https://img.shields.io/badge/Dataset-AI4I_2020-purple)
 
-The project goal is to develop a small predictive maintenance prototype that:
+## Overview
+Modern deep learning and ensemble classifiers achieve high accuracy in predicting industrial equipment failures, yet their "black-box" nature often prevents maintenance engineers from trusting automated alerts in safety-critical environments. 
 
-- detects abnormal machine behavior using anomaly detection
-- classifies machine records as failure or no failure
-- compares interpretable decision trees with a small neural network
-- studies correlations and engineered sensor relationships
-- explains model outcomes using feature importance, SHAP, and LIME
-- evaluates explanation faithfulness and stability
-- demonstrates transparency, reliability, error tradeoffs, and appropriate-use limits
+Developed as a graduate course project on **Responsible and Explainable AI** at the **University of Regina**, this repository implements an end-to-end **Predictive Maintenance & Root-Cause Diagnostic Pipeline** on the **AI4I 2020 Predictive Maintenance Dataset**. By pairing neural network and machine learning classifiers with post-hoc explainability frameworks (**SHAP** and **LIME**), the system translates raw telemetry predictions into transparent, human-auditable maintenance insights.
 
-## Project Structure
+---
 
-```text
-data/
-  raw/                  # Place the AI4I 2020 CSV here
-  processed/            # Reserved for processed data artifacts
-docs/
-  project_proposal.md
-notes/
-  linear_regression_from_scratch.md
-outputs/                # Pipeline reports are written here
-src/
-  predictive_maintenance/
-    anomaly.py
-    classification.py
-    config.py
-    data_loader.py
-    explainability.py
-    neural_network.py
-    preprocessing.py
-  01_data_exploration/
-  02_data_preprocessing/
-  03_anomaly_detection/
-  04_failure_classification/
-  05_neural_network/
-  06_feature_relationship_analysis/
-  07_explainable_ai/
-  08_integrated_research_analysis/
-  linear_regression_from_scratch.py
+## System Architecture
+
+```mermaid
+flowchart LR
+    A[data/ AI4I 2020 Telemetry] --> B[src/ Preprocessing & Feature Engineering]
+    B --> C[src/ Neural Network & ML Classifiers]
+    C --> D[Binary & Multi-Class Failure Predictions]
+    C --> E[scripts/ Explainability Engine: SHAP & LIME]
+    D --> F[outputs/ Diagnostic Plots & Metrics]
+    E --> F
+    F --> G[presentation/ & docs/ Governance Audit]
 ```
 
-## Setup
+---
 
-Create a virtual environment and install dependencies:
+## Key Features & Industrial Failure Modes
+* **Telemetry & Physical Feature Modeling:** Evaluates air temperature, process temperature, rotational speed (RPM), torque (Nm), and tool wear (minutes) across varying product quality tiers (`L`, `M`, `H`).
+* **Multi-Mode Failure Diagnostics:** Detects overall machine failure alongside five distinct root-cause failure modes:
+  * **TWF:** Tool Wear Failure
+  * **HDF:** Heat Dissipation Failure
+  * **PWF:** Power Failure
+  * **OSF:** Overstrain Failure
+  * **RNF:** Random Failures
+* **Global & Local Interpretability (XAI):**
+  * **Global Attribution (SHAP Summary & Dependence Plots):** Identifies which physical sensors drive risk across the entire factory floor.
+  * **Instance-Level Diagnostics (LIME & SHAP Force/Waterfall Plots):** Explains *why* an individual machine was flagged for imminent failure so technicians know exactly which component to inspect.
 
+---
+
+## Repository Structure
+
+```text
+xai-predictive-maintenance/
+├── data/                   # AI4I 2020 Predictive Maintenance dataset & processed splits
+├── docs/                   # Project report, literature review, and Responsible AI documentation
+├── notes/                  # Research notes and explainability methodology breakdowns
+├── outputs/                # Generated confusion matrices, ROC curves, SHAP, and LIME visualizations
+├── presentation/           # Final project defense slide deck and speaker materials
+├── scripts/                # Execution scripts for model training and XAI explainability generation
+├── src/                    # Core source modules (data preprocessing, neural network, and ML models)
+├── .gitignore              # Git exclusion rules for virtual environments and cache files
+├── requirements.txt        # Python package dependencies
+└── README.md               # Project documentation
+```
+
+---
+
+## Quickstart & Reproduction
+
+### 1. Clone the Repository
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+git clone [https://github.com/dipenpatel1/xai-predictive-maintenance.git](https://github.com/dipenpatel1/xai-predictive-maintenance.git)
+cd xai-predictive-maintenance
+```
+
+### 2. Install Dependencies
+```bash
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
+
 pip install -r requirements.txt
 ```
 
-Download the AI4I 2020 Predictive Maintenance Dataset and place the CSV at:
-
-```text
-data/raw/ai4i2020.csv
-```
-
-The expected target column is:
-
-```text
-Machine failure
-```
-
-## Run the Project
-
-Run notebooks `01` through `08` in order. Each notebook explains its theory,
-implementation, executed findings, and report-ready artifacts. See
-`docs/reproducibility_guide.md` for the output-generation workflow.
-
-## Learning Track
-
-Before building the full predictive maintenance pipeline, we are implementing core ML ideas from first principles.
-
-Current module:
-
-- `src/linear_regression_from_scratch.py`
-
-This script implements simple linear regression using pure Python:
-
-- prediction: `y_hat = wx + b`
-- residuals/errors
-- mean squared error
-- gradients with respect to `w` and `b`
-- gradient descent
-- convergence history
-
-Run it with:
-
+### 3. Run Training & Explainability Scripts
+Execute the training and explainability scripts in `scripts/` and `src/` to train the predictive models and regenerate the diagnostic plots inside `outputs/`:
 ```bash
-python3 src/linear_regression_from_scratch.py
+python scripts/train.py
 ```
-# predictive_maintenance_with_explainable_ai
+
+---
+
+## Contributors & Academic Context
+* **Dipen Patel** ([@dipenpatel1](https://github.com/dipenpatel1)) — *Master of Engineering in Software Systems Engineering, University of Regina*
+* **Bijay Pandey** ([@Bijay2052](https://github.com/Bijay2052)) — *University of Regina*
+* **Course:** Responsible and Explainable AI (`ENSE 861` / `ENSE 885BG`), Faculty of Engineering & Applied Science, University of Regina.
